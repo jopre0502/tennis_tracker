@@ -144,8 +144,30 @@ const TennolinoTracker = () => {
       h.winner === 'a' ? players.a : players.b,
       h.timestamp
     ]);
+
+    const stats = getStats();
+    const totalPoints = stats.totals.points;
+    const statRows = [
+      [],
+      ['Statistik', players.a, players.b],
+      ['Gewonnene Punkte', formatStat(stats.players.a.pointsWon, totalPoints), formatStat(stats.players.b.pointsWon, totalPoints)],
+      ['Gewonnene Punkte (Ace + Winner)', formatStat(stats.players.a.pointsWonByWinners, totalPoints), formatStat(stats.players.b.pointsWonByWinners, totalPoints)],
+      ['Verlorene Punkte (Fehler)', formatStat(stats.players.a.pointsLostByErrors, totalPoints), formatStat(stats.players.b.pointsLostByErrors, totalPoints)],
+      ['Aufschlagpunkte gewonnen', formatStat(stats.players.a.servicePointsWon, stats.players.a.servicePoints), formatStat(stats.players.b.servicePointsWon, stats.players.b.servicePoints)],
+      ['Returnpunkte gewonnen', formatStat(stats.players.a.returnPointsWon, stats.players.a.returnPoints), formatStat(stats.players.b.returnPointsWon, stats.players.b.returnPoints)],
+      ['1. Aufschlagpunkte (Anteil)', formatStat(stats.players.a.firstServePoints, stats.players.a.servicePoints), formatStat(stats.players.b.firstServePoints, stats.players.b.servicePoints)],
+      ['1. Aufschlagpunkte gewonnen', formatStat(stats.players.a.firstServePointsWon, stats.players.a.firstServePoints), formatStat(stats.players.b.firstServePointsWon, stats.players.b.firstServePoints)],
+      ['2. Aufschlagpunkte (Anteil)', formatStat(stats.players.a.secondServePoints, stats.players.a.servicePoints), formatStat(stats.players.b.secondServePoints, stats.players.b.servicePoints)],
+      ['2. Aufschlagpunkte gewonnen', formatStat(stats.players.a.secondServePointsWon, stats.players.a.secondServePoints), formatStat(stats.players.b.secondServePointsWon, stats.players.b.secondServePoints)],
+      ['Asse', formatStat(stats.players.a.aces, totalPoints), formatStat(stats.players.b.aces, totalPoints)],
+      ['Doppelfehler', formatStat(stats.players.a.doubleFaults, totalPoints), formatStat(stats.players.b.doubleFaults, totalPoints)],
+      ['Winner', formatStat(stats.players.a.winners, totalPoints), formatStat(stats.players.b.winners, totalPoints)],
+      ['Forced Errors', formatStat(stats.players.a.forcedErrors, totalPoints), formatStat(stats.players.b.forcedErrors, totalPoints)],
+      ['Unforced Errors', formatStat(stats.players.a.unforcedErrors, totalPoints), formatStat(stats.players.b.unforcedErrors, totalPoints)],
+      ['Hinweis', 'Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte']
+    ].map(row => row.concat(Array(headers.length - row.length).fill('')));
     
-    const csv = [headers, ...rows].map(row => row.join(';')).join('\n');
+    const csv = [headers, ...rows, ...statRows].map(row => row.join(';')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -154,24 +176,180 @@ const TennolinoTracker = () => {
     a.click();
   };
 
+  const getStatsText = () => {
+    const stats = getStats();
+    const totalPoints = stats.totals.points;
+    const lines = [
+      `Match: ${players.a} vs ${players.b}`,
+      `Ergebnis: ${sets.a} : ${sets.b}`,
+      `Gewinner: ${winner ? players[winner] : '-'}`,
+      `Gesamtpunkte: ${totalPoints}`,
+      '',
+      'Gesamt',
+      `Gewinnschlaege (Ace + Winner): ${formatStat(stats.totals.winningShots, totalPoints)}`,
+      `Fehlerpunkte (Doppelfehler + Forced + Unforced): ${formatStat(stats.totals.errorPoints, totalPoints)}`,
+      '',
+      players.a,
+      `Gewonnene Punkte: ${formatStat(stats.players.a.pointsWon, totalPoints)}`,
+      `Gewonnene Punkte (Ace + Winner): ${formatStat(stats.players.a.pointsWonByWinners, totalPoints)}`,
+      `Verlorene Punkte (Fehler): ${formatStat(stats.players.a.pointsLostByErrors, totalPoints)}`,
+      `Aufschlagpunkte gewonnen: ${formatStat(stats.players.a.servicePointsWon, stats.players.a.servicePoints)}`,
+      `Returnpunkte gewonnen: ${formatStat(stats.players.a.returnPointsWon, stats.players.a.returnPoints)}`,
+      `1. Aufschlagpunkte (Anteil): ${formatStat(stats.players.a.firstServePoints, stats.players.a.servicePoints)}`,
+      `1. Aufschlagpunkte gewonnen: ${formatStat(stats.players.a.firstServePointsWon, stats.players.a.firstServePoints)}`,
+      `2. Aufschlagpunkte (Anteil): ${formatStat(stats.players.a.secondServePoints, stats.players.a.servicePoints)}`,
+      `2. Aufschlagpunkte gewonnen: ${formatStat(stats.players.a.secondServePointsWon, stats.players.a.secondServePoints)}`,
+      `Asse: ${formatStat(stats.players.a.aces, totalPoints)}`,
+      `Doppelfehler: ${formatStat(stats.players.a.doubleFaults, totalPoints)}`,
+      `Winner: ${formatStat(stats.players.a.winners, totalPoints)}`,
+      `Forced Errors: ${formatStat(stats.players.a.forcedErrors, totalPoints)}`,
+      `Unforced Errors: ${formatStat(stats.players.a.unforcedErrors, totalPoints)}`,
+      '',
+      players.b,
+      `Gewonnene Punkte: ${formatStat(stats.players.b.pointsWon, totalPoints)}`,
+      `Gewonnene Punkte (Ace + Winner): ${formatStat(stats.players.b.pointsWonByWinners, totalPoints)}`,
+      `Verlorene Punkte (Fehler): ${formatStat(stats.players.b.pointsLostByErrors, totalPoints)}`,
+      `Aufschlagpunkte gewonnen: ${formatStat(stats.players.b.servicePointsWon, stats.players.b.servicePoints)}`,
+      `Returnpunkte gewonnen: ${formatStat(stats.players.b.returnPointsWon, stats.players.b.returnPoints)}`,
+      `1. Aufschlagpunkte (Anteil): ${formatStat(stats.players.b.firstServePoints, stats.players.b.servicePoints)}`,
+      `1. Aufschlagpunkte gewonnen: ${formatStat(stats.players.b.firstServePointsWon, stats.players.b.firstServePoints)}`,
+      `2. Aufschlagpunkte (Anteil): ${formatStat(stats.players.b.secondServePoints, stats.players.b.servicePoints)}`,
+      `2. Aufschlagpunkte gewonnen: ${formatStat(stats.players.b.secondServePointsWon, stats.players.b.secondServePoints)}`,
+      `Asse: ${formatStat(stats.players.b.aces, totalPoints)}`,
+      `Doppelfehler: ${formatStat(stats.players.b.doubleFaults, totalPoints)}`,
+      `Winner: ${formatStat(stats.players.b.winners, totalPoints)}`,
+      `Forced Errors: ${formatStat(stats.players.b.forcedErrors, totalPoints)}`,
+      `Unforced Errors: ${formatStat(stats.players.b.unforcedErrors, totalPoints)}`,
+      '',
+      'Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte'
+    ];
+
+    return lines.join('\n');
+  };
+
+  const copyStatsToClipboard = async () => {
+    const text = getStatsText();
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('Statistik in die Zwischenablage kopiert.');
+    } catch (err) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '0';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      if (success) {
+        alert('Statistik in die Zwischenablage kopiert.');
+      } else {
+        alert('Kopieren fehlgeschlagen. Bitte erneut versuchen.');
+      }
+    }
+  };
+
   const getStats = () => {
-    const stats = { a: { aces: 0, doubleFaults: 0, winners: 0, forcedErrors: 0, unforcedErrors: 0 }, 
-                    b: { aces: 0, doubleFaults: 0, winners: 0, forcedErrors: 0, unforcedErrors: 0 }};
+    const stats = { 
+      a: { 
+        aces: 0,
+        doubleFaults: 0,
+        winners: 0,
+        forcedErrors: 0,
+        unforcedErrors: 0,
+        pointsWon: 0,
+        servicePoints: 0,
+        servicePointsWon: 0,
+        returnPointsWon: 0,
+        firstServePoints: 0,
+        firstServePointsWon: 0,
+        secondServePoints: 0,
+        secondServePointsWon: 0
+      }, 
+      b: { 
+        aces: 0,
+        doubleFaults: 0,
+        winners: 0,
+        forcedErrors: 0,
+        unforcedErrors: 0,
+        pointsWon: 0,
+        servicePoints: 0,
+        servicePointsWon: 0,
+        returnPointsWon: 0,
+        firstServePoints: 0,
+        firstServePointsWon: 0,
+        secondServePoints: 0,
+        secondServePointsWon: 0
+      } 
+    };
+    const totals = { points: history.length, aces: 0, doubleFaults: 0, winners: 0, forcedErrors: 0, unforcedErrors: 0 };
     
     history.forEach(h => {
-      if (h.type === 'ace') stats[h.winner].aces++;
-      if (h.type === 'double_fault') stats[h.server].doubleFaults++;
-      if (h.type === 'winner') stats[h.winner].winners++;
+      const serverPlayer = h.server;
+      const receiver = serverPlayer === 'a' ? 'b' : 'a';
+
+      stats[serverPlayer].servicePoints++;
+      if (h.isSecondServe) {
+        stats[serverPlayer].secondServePoints++;
+      } else {
+        stats[serverPlayer].firstServePoints++;
+      }
+
+      stats[h.winner].pointsWon++;
+      if (h.winner === serverPlayer) {
+        stats[serverPlayer].servicePointsWon++;
+        if (h.isSecondServe) {
+          stats[serverPlayer].secondServePointsWon++;
+        } else {
+          stats[serverPlayer].firstServePointsWon++;
+        }
+      } else {
+        stats[receiver].returnPointsWon++;
+      }
+
+      if (h.type === 'ace') {
+        stats[h.winner].aces++;
+        totals.aces++;
+      }
+      if (h.type === 'double_fault') {
+        stats[h.server].doubleFaults++;
+        totals.doubleFaults++;
+      }
+      if (h.type === 'winner') {
+        stats[h.winner].winners++;
+        totals.winners++;
+      }
       if (h.type === 'forced_error') {
         const loser = h.winner === 'a' ? 'b' : 'a';
         stats[loser].forcedErrors++;
+        totals.forcedErrors++;
       }
       if (h.type === 'unforced_error') {
         const loser = h.winner === 'a' ? 'b' : 'a';
         stats[loser].unforcedErrors++;
+        totals.unforcedErrors++;
       }
     });
-    return stats;
+
+    ['a', 'b'].forEach(p => {
+      stats[p].returnPoints = totals.points - stats[p].servicePoints;
+      stats[p].pointsLost = totals.points - stats[p].pointsWon;
+      stats[p].pointsWonByWinners = stats[p].aces + stats[p].winners;
+      stats[p].pointsLostByErrors = stats[p].doubleFaults + stats[p].forcedErrors + stats[p].unforcedErrors;
+    });
+
+    totals.winningShots = totals.aces + totals.winners;
+    totals.errorPoints = totals.doubleFaults + totals.forcedErrors + totals.unforcedErrors;
+
+    return { players: stats, totals };
+  };
+
+  const formatStat = (count, total) => {
+    if (total === 0) return `${count} (0%)`;
+    const pct = Math.round((count / total) * 100);
+    return `${count} (${pct}%)`;
   };
 
   const resetMatch = () => {
@@ -278,6 +456,7 @@ const TennolinoTracker = () => {
 
   if (matchOver) {
     const stats = getStats();
+    const totalPoints = stats.totals.points;
     return (
       <div className="min-h-screen bg-green-900 p-4">
         <div className="bg-white rounded-lg p-6 max-w-md mx-auto shadow-xl">
@@ -286,6 +465,21 @@ const TennolinoTracker = () => {
           
           <div className="text-center text-3xl font-bold mb-6">
             {sets.a} : {sets.b}
+          </div>
+
+          <div className="text-center text-sm text-gray-600 mb-4">
+            Gesamtpunkte: {totalPoints}
+          </div>
+
+          <div className="bg-gray-100 rounded-lg p-3 mb-6 text-sm">
+            <div className="flex justify-between">
+              <span>Gewinnschlaege (Ace + Winner)</span>
+              <span>{formatStat(stats.totals.winningShots, totalPoints)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Fehlerpunkte (Doppelfehler + Forced + Unforced)</span>
+              <span>{formatStat(stats.totals.errorPoints, totalPoints)}</span>
+            </div>
           </div>
           
           <table className="w-full text-sm mb-6">
@@ -297,17 +491,33 @@ const TennolinoTracker = () => {
               </tr>
             </thead>
             <tbody>
-              <tr><td className="py-1">Asse</td><td className="text-center">{stats.a.aces}</td><td className="text-center">{stats.b.aces}</td></tr>
-              <tr><td className="py-1">Doppelfehler</td><td className="text-center">{stats.a.doubleFaults}</td><td className="text-center">{stats.b.doubleFaults}</td></tr>
-              <tr><td className="py-1">Winner</td><td className="text-center">{stats.a.winners}</td><td className="text-center">{stats.b.winners}</td></tr>
-              <tr><td className="py-1">Forced Errors</td><td className="text-center">{stats.a.forcedErrors}</td><td className="text-center">{stats.b.forcedErrors}</td></tr>
-              <tr><td className="py-1">Unforced Errors</td><td className="text-center">{stats.a.unforcedErrors}</td><td className="text-center">{stats.b.unforcedErrors}</td></tr>
+              <tr><td className="py-1">Gewonnene Punkte</td><td className="text-center">{formatStat(stats.players.a.pointsWon, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.pointsWon, totalPoints)}</td></tr>
+              <tr><td className="py-1">Gewonnene Punkte (Ace + Winner)</td><td className="text-center">{formatStat(stats.players.a.pointsWonByWinners, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.pointsWonByWinners, totalPoints)}</td></tr>
+              <tr><td className="py-1">Verlorene Punkte (Fehler)</td><td className="text-center">{formatStat(stats.players.a.pointsLostByErrors, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.pointsLostByErrors, totalPoints)}</td></tr>
+              <tr><td className="py-1">Aufschlagpunkte gewonnen</td><td className="text-center">{formatStat(stats.players.a.servicePointsWon, stats.players.a.servicePoints)}</td><td className="text-center">{formatStat(stats.players.b.servicePointsWon, stats.players.b.servicePoints)}</td></tr>
+              <tr><td className="py-1">Returnpunkte gewonnen</td><td className="text-center">{formatStat(stats.players.a.returnPointsWon, stats.players.a.returnPoints)}</td><td className="text-center">{formatStat(stats.players.b.returnPointsWon, stats.players.b.returnPoints)}</td></tr>
+              <tr><td className="py-1">1. Aufschlagpunkte (Anteil)</td><td className="text-center">{formatStat(stats.players.a.firstServePoints, stats.players.a.servicePoints)}</td><td className="text-center">{formatStat(stats.players.b.firstServePoints, stats.players.b.servicePoints)}</td></tr>
+              <tr><td className="py-1">1. Aufschlagpunkte gewonnen</td><td className="text-center">{formatStat(stats.players.a.firstServePointsWon, stats.players.a.firstServePoints)}</td><td className="text-center">{formatStat(stats.players.b.firstServePointsWon, stats.players.b.firstServePoints)}</td></tr>
+              <tr><td className="py-1">2. Aufschlagpunkte (Anteil)</td><td className="text-center">{formatStat(stats.players.a.secondServePoints, stats.players.a.servicePoints)}</td><td className="text-center">{formatStat(stats.players.b.secondServePoints, stats.players.b.servicePoints)}</td></tr>
+              <tr><td className="py-1">2. Aufschlagpunkte gewonnen</td><td className="text-center">{formatStat(stats.players.a.secondServePointsWon, stats.players.a.secondServePoints)}</td><td className="text-center">{formatStat(stats.players.b.secondServePointsWon, stats.players.b.secondServePoints)}</td></tr>
+              <tr><td className="py-1">Asse</td><td className="text-center">{formatStat(stats.players.a.aces, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.aces, totalPoints)}</td></tr>
+              <tr><td className="py-1">Doppelfehler</td><td className="text-center">{formatStat(stats.players.a.doubleFaults, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.doubleFaults, totalPoints)}</td></tr>
+              <tr><td className="py-1">Winner</td><td className="text-center">{formatStat(stats.players.a.winners, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.winners, totalPoints)}</td></tr>
+              <tr><td className="py-1">Forced Errors</td><td className="text-center">{formatStat(stats.players.a.forcedErrors, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.forcedErrors, totalPoints)}</td></tr>
+              <tr><td className="py-1">Unforced Errors</td><td className="text-center">{formatStat(stats.players.a.unforcedErrors, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.unforcedErrors, totalPoints)}</td></tr>
             </tbody>
           </table>
+
+          <div className="text-xs text-gray-600 mb-6">
+            Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte
+          </div>
           
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
             <button onClick={exportCSV} className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-medium">
               CSV Export
+            </button>
+            <button onClick={copyStatsToClipboard} className="flex-1 p-3 bg-green-600 text-white rounded-lg font-medium">
+              Stats kopieren
             </button>
             <button onClick={resetMatch} className="flex-1 p-3 bg-gray-600 text-white rounded-lg font-medium">
               Neues Match
