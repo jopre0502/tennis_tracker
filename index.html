@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#14532d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tennolino">
+    <title>Tennolino Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; overscroll-behavior: none; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+const { useState } = React;
+
+const TennolinoTracker = () => {
+  const [players, setPlayers] = useState({ a: 'Spieler A', b: 'Spieler B' });
+  const [editing, setEditing] = useState(true);
+  const [score, setScore] = useState({ a: 0, b: 0 });
+  const [sets, setSets] = useState({ a: 0, b: 0 });
+  const [currentSet, setCurrentSet] = useState(1);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [server, setServer] = useState('a');
+  const [setInitialServer, setSetInitialServer] = useState('a');
+  const [phase, setPhase] = useState('serve');
+  const [isSecondServe, setIsSecondServe] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [matchOver, setMatchOver] = useState(false);
+  const [winner, setWinner] = useState(null);
+
+  const getSetTarget = () => currentSet === 3 ? 5 : 7;
+
+  const getServerAfterPoints = (points, initialServer) => {
+    const switches = Math.floor(points / 2);
+    return switches % 2 === 0 ? initialServer : (initialServer === 'a' ? 'b' : 'a');
+  };
+
+  const addPointToHistory = (pointData) => {
+    setHistory(prev => [...prev, {
+      ...pointData,
+      set: currentSet,
+      setInitialServer: setInitialServer,
+      scoreAfter: { ...score, [pointData.winner]: score[pointData.winner] + 1 },
+      setsAfter: { ...sets },
+      timestamp: new Date().toISOString()
+    }]);
+  };
+
+  const checkSetWin = (newScore) => {
+    const target = getSetTarget();
+    if (newScore.a >= target) return 'a';
+    if (newScore.b >= target) return 'b';
+    return null;
+  };
+
+  const checkMatchWin = (newSets) => {
+    if (newSets.a >= 2) return 'a';
+    if (newSets.b >= 2) return 'b';
+    return null;
+  };
+
+  const awardPoint = (pointWinner, type, details) => {
+    const pointData = {
+      winner: pointWinner,
+      type,
+      details,
+      server,
+      isSecondServe
+    };
+    addPointToHistory(pointData);
+
+    const newScore = { ...score, [pointWinner]: score[pointWinner] + 1 };
+    const newTotalPoints = totalPoints + 1;
+
+    const setWinnerPlayer = checkSetWin(newScore);
+    
+    if (setWinnerPlayer) {
+      const newSets = { ...sets, [setWinnerPlayer]: sets[setWinnerPlayer] + 1 };
+      setSets(newSets);
+      
+      const matchWinnerPlayer = checkMatchWin(newSets);
+      if (matchWinnerPlayer) {
+        setMatchOver(true);
+        setWinner(matchWinnerPlayer);
+        setScore(newScore);
+        return;
+      }
+      
+      setScore({ a: 0, b: 0 });
+      setCurrentSet(currentSet + 1);
+      setTotalPoints(0);
+      const newSetInitialServer = setInitialServer === 'a' ? 'b' : 'a';
+      setSetInitialServer(newSetInitialServer);
+      setServer(newSetInitialServer);
+    } else {
+      setScore(newScore);
+      setTotalPoints(newTotalPoints);
+      setServer(getServerAfterPoints(newTotalPoints, setInitialServer));
+    }
+    
+    setPhase('serve');
+    setIsSecondServe(false);
+  };
+
+  const handleServe = (result) => {
+    if (result === 'ace') {
+      awardPoint(server, 'ace', { serve: isSecondServe ? 2 : 1 });
+    } else if (result === 'fault') {
+      if (isSecondServe) {
+        const receiver = server === 'a' ? 'b' : 'a';
+        awardPoint(receiver, 'double_fault', {});
+      } else {
+        setIsSecondServe(true);
+      }
+    } else if (result === 'in_play') {
+      setPhase('rally');
+    }
+  };
+
+  const handleRally = (pointWinner, type) => {
+    awardPoint(pointWinner, type, { serve: isSecondServe ? 2 : 1 });
+  };
+
+  const exportCSV = () => {
+    const headers = ['Set', 'Punktestand A', 'Punktestand B', 'Aufschlag', 'Typ', 'Gewinner', 'Zeitstempel'];
+    const rows = history.map(h => [
+      h.set,
+      h.scoreAfter.a,
+      h.scoreAfter.b,
+      h.server === 'a' ? players.a : players.b,
+      h.type,
+      h.winner === 'a' ? players.a : players.b,
+      h.timestamp
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.join(';')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tennolino_${players.a}_vs_${players.b}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+  };
+
+  const getStats = () => {
+    const stats = { a: { aces: 0, doubleFaults: 0, winners: 0, forcedErrors: 0, unforcedErrors: 0 }, 
+                    b: { aces: 0, doubleFaults: 0, winners: 0, forcedErrors: 0, unforcedErrors: 0 }};
+    
+    history.forEach(h => {
+      if (h.type === 'ace') stats[h.winner].aces++;
+      if (h.type === 'double_fault') stats[h.server].doubleFaults++;
+      if (h.type === 'winner') stats[h.winner].winners++;
+      if (h.type === 'forced_error') {
+        const loser = h.winner === 'a' ? 'b' : 'a';
+        stats[loser].forcedErrors++;
+      }
+      if (h.type === 'unforced_error') {
+        const loser = h.winner === 'a' ? 'b' : 'a';
+        stats[loser].unforcedErrors++;
+      }
+    });
+    return stats;
+  };
+
+  const resetMatch = () => {
+    setScore({ a: 0, b: 0 });
+    setSets({ a: 0, b: 0 });
+    setCurrentSet(1);
+    setTotalPoints(0);
+    setServer('a');
+    setSetInitialServer('a');
+    setPhase('serve');
+    setIsSecondServe(false);
+    setHistory([]);
+    setMatchOver(false);
+    setWinner(null);
+    setEditing(true);
+  };
+
+  const undoLastPoint = () => {
+    if (history.length === 0) return;
+    
+    const newHistory = [...history];
+    const lastPoint = newHistory.pop();
+    setHistory(newHistory);
+    
+    if (newHistory.length === 0) {
+      setScore({ a: 0, b: 0 });
+      setSets({ a: 0, b: 0 });
+      setCurrentSet(1);
+      setTotalPoints(0);
+      setSetInitialServer(lastPoint.setInitialServer);
+      setServer(lastPoint.setInitialServer);
+    } else {
+      const prevPoint = newHistory[newHistory.length - 1];
+      setScore(prevPoint.scoreAfter);
+      setSets(prevPoint.setsAfter);
+      setCurrentSet(prevPoint.set);
+      setSetInitialServer(prevPoint.setInitialServer);
+      
+      const pointsInSet = newHistory.filter(h => h.set === prevPoint.set).length;
+      setTotalPoints(pointsInSet);
+      setServer(getServerAfterPoints(pointsInSet, prevPoint.setInitialServer));
+    }
+    
+    setPhase('serve');
+    setIsSecondServe(false);
+    setMatchOver(false);
+    setWinner(null);
+  };
+
+  if (editing) {
+    return (
+      <div className="min-h-screen bg-green-900 p-4 flex flex-col items-center justify-center">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+          <h1 className="text-2xl font-bold text-center mb-6 text-green-800">Tennolino Tracker</h1>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Spieler A</label>
+              <input
+                type="text"
+                value={players.a}
+                onChange={(e) => setPlayers({...players, a: e.target.value})}
+                className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Spieler B</label>
+              <input
+                type="text"
+                value={players.b}
+                onChange={(e) => setPlayers({...players, b: e.target.value})}
+                className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Erster Aufschlag</label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setServer('a'); setSetInitialServer('a'); }}
+                  className={`flex-1 p-3 rounded-lg font-medium ${server === 'a' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+                >
+                  {players.a}
+                </button>
+                <button
+                  onClick={() => { setServer('b'); setSetInitialServer('b'); }}
+                  className={`flex-1 p-3 rounded-lg font-medium ${server === 'b' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+                >
+                  {players.b}
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <button
+            onClick={() => setEditing(false)}
+            className="w-full mt-6 p-4 bg-green-600 text-white rounded-lg text-xl font-bold"
+          >
+            Match starten
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (matchOver) {
+    const stats = getStats();
+    return (
+      <div className="min-h-screen bg-green-900 p-4">
+        <div className="bg-white rounded-lg p-6 max-w-md mx-auto shadow-xl">
+          <h1 className="text-2xl font-bold text-center mb-2 text-green-800">Match beendet</h1>
+          <p className="text-center text-xl mb-6">{players[winner]} gewinnt!</p>
+          
+          <div className="text-center text-3xl font-bold mb-6">
+            {sets.a} : {sets.b}
+          </div>
+          
+          <table className="w-full text-sm mb-6">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left py-2"></th>
+                <th className="text-center py-2">{players.a}</th>
+                <th className="text-center py-2">{players.b}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td className="py-1">Asse</td><td className="text-center">{stats.a.aces}</td><td className="text-center">{stats.b.aces}</td></tr>
+              <tr><td className="py-1">Doppelfehler</td><td className="text-center">{stats.a.doubleFaults}</td><td className="text-center">{stats.b.doubleFaults}</td></tr>
+              <tr><td className="py-1">Winner</td><td className="text-center">{stats.a.winners}</td><td className="text-center">{stats.b.winners}</td></tr>
+              <tr><td className="py-1">Forced Errors</td><td className="text-center">{stats.a.forcedErrors}</td><td className="text-center">{stats.b.forcedErrors}</td></tr>
+              <tr><td className="py-1">Unforced Errors</td><td className="text-center">{stats.a.unforcedErrors}</td><td className="text-center">{stats.b.unforcedErrors}</td></tr>
+            </tbody>
+          </table>
+          
+          <div className="flex gap-2">
+            <button onClick={exportCSV} className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-medium">
+              CSV Export
+            </button>
+            <button onClick={resetMatch} className="flex-1 p-3 bg-gray-600 text-white rounded-lg font-medium">
+              Neues Match
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-green-900 p-4">
+      <div className="max-w-md mx-auto">
+        {/* Scoreboard */}
+        <div className="bg-gray-900 rounded-lg p-4 mb-4 text-white">
+          <div className="flex justify-between items-center mb-2 text-sm text-gray-400">
+            <span>Satz {currentSet} | bis {getSetTarget()}</span>
+            <span>Sätze</span>
+          </div>
+          
+          {['a', 'b'].map((p) => (
+            <div key={p} className={`flex items-center py-3 ${p === 'a' ? 'border-b border-gray-700' : ''}`}>
+              <div className="flex items-center flex-1">
+                {server === p && <span className="w-3 h-3 bg-yellow-400 rounded-full mr-2"></span>}
+                {server !== p && <span className="w-3 mr-2"></span>}
+                <span className="text-lg">{players[p]}</span>
+              </div>
+              <span className="text-4xl font-bold w-16 text-center">{score[p]}</span>
+              <span className="text-2xl w-12 text-center text-gray-400">{sets[p]}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Phase Indicator */}
+        <div className="text-center text-white mb-4">
+          {phase === 'serve' && (
+            <span className="bg-yellow-600 px-4 py-1 rounded-full text-sm">
+              {isSecondServe ? '2. Aufschlag' : '1. Aufschlag'} - {players[server]}
+            </span>
+          )}
+          {phase === 'rally' && (
+            <span className="bg-blue-600 px-4 py-1 rounded-full text-sm">Rally</span>
+          )}
+        </div>
+
+        {/* Serve Buttons */}
+        {phase === 'serve' && (
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <button
+              onClick={() => handleServe('ace')}
+              className="p-6 bg-green-600 text-white rounded-lg text-lg font-bold active:bg-green-700"
+            >
+              ACE
+            </button>
+            <button
+              onClick={() => handleServe('fault')}
+              className="p-6 bg-red-600 text-white rounded-lg text-lg font-bold active:bg-red-700"
+            >
+              FAULT
+            </button>
+            <button
+              onClick={() => handleServe('in_play')}
+              className="p-6 bg-blue-600 text-white rounded-lg text-lg font-bold active:bg-blue-700"
+            >
+              IN PLAY
+            </button>
+          </div>
+        )}
+
+        {/* Rally Buttons */}
+        {phase === 'rally' && (
+          <div className="space-y-4">
+            {['a', 'b'].map((p) => (
+              <div key={p} className="bg-gray-800 rounded-lg p-3">
+                <div className="text-white text-sm mb-2 font-medium">{players[p]}</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => handleRally(p, 'winner')}
+                    className="p-4 bg-green-600 text-white rounded-lg font-bold active:bg-green-700"
+                  >
+                    Winner
+                  </button>
+                  <button
+                    onClick={() => handleRally(p === 'a' ? 'b' : 'a', 'forced_error')}
+                    className="p-4 bg-orange-600 text-white rounded-lg font-bold active:bg-orange-700"
+                  >
+                    Forced
+                  </button>
+                  <button
+                    onClick={() => handleRally(p === 'a' ? 'b' : 'a', 'unforced_error')}
+                    className="p-4 bg-red-600 text-white rounded-lg font-bold active:bg-red-700"
+                  >
+                    Unforced
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Undo Button */}
+        <button
+          onClick={undoLastPoint}
+          disabled={history.length === 0}
+          className="w-full mt-4 p-3 bg-gray-700 text-white rounded-lg font-medium disabled:opacity-50"
+        >
+          Rückgängig
+        </button>
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<TennolinoTracker />);
+    </script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
