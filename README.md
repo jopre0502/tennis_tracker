@@ -36,7 +36,7 @@ npx serve tennolino-pwa
 2. Lade alle Dateien hoch
 3. Gehe zu Settings > Pages
 4. Wähle "Deploy from a branch" > main
-5. Nach 1-2 Minuten ist die App online unter `https://dein-username.github.io/repo-name`
+5. Nach 1-2 Minuten ist die App online unter `https://jopre0502.github.io/tennis_tracker`
 
 ## Auf Handy installieren
 
