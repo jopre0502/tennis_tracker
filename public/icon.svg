@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" fill="#14532d" rx="24"/>
+  <circle cx="96" cy="96" r="50" fill="#fbbf24" stroke="#fff" stroke-width="4"/>
+  <path d="M96 46 C96 46 96 146 96 146" stroke="#fff" stroke-width="3"/>
+  <path d="M46 96 C46 96 146 96 146 96" stroke="#fff" stroke-width="3"/>
+  <text x="96" y="175" text-anchor="middle" fill="#fff" font-family="Arial" font-size="16" font-weight="bold">TENNOLINO</text>
+</svg>
