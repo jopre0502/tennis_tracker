@@ -160,7 +160,7 @@ const TennolinoTracker = () => {
       ['Hinweis', 'Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte']
     ].map(row => row.concat(Array(headers.length - row.length).fill('')));
 
-    const csv = [headers, ...rows, ...statRows].map(row => row.join(';')).join('\\n');
+    const csv = [headers, ...rows, ...statRows].map(row => row.join(';')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -217,7 +217,7 @@ const TennolinoTracker = () => {
       'Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte'
     ];
 
-    return lines.join('\\n');
+    return lines.join('\n');
   };
 
   const copyStatsToClipboard = async () => {
