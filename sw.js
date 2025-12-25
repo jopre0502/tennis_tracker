@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tennolino-v7';
+const CACHE_NAME = 'tennolino-v8';
 const ASSETS = [
   './',
   './index.html',
