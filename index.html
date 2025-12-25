@@ -565,25 +565,38 @@ const TennolinoTracker = () => {
 
         {/* Serve Buttons */}
         {phase === 'serve' && (
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <button
-              onClick={() => handleServe('ace')}
-              className="p-6 bg-green-600 text-white rounded-lg text-lg font-bold active:bg-green-700"
-            >
-              ACE
-            </button>
-            <button
-              onClick={() => handleServe('fault')}
-              className="p-6 bg-red-600 text-white rounded-lg text-lg font-bold active:bg-red-700"
-            >
-              FAULT
-            </button>
-            <button
-              onClick={() => handleServe('in_play')}
-              className="p-6 bg-blue-600 text-white rounded-lg text-lg font-bold active:bg-blue-700"
-            >
-              IN PLAY
-            </button>
+          <div className="space-y-4 mb-4">
+            {['a', 'b'].map((p) => (
+              <div key={p} className="bg-gray-800 rounded-lg p-3">
+                <div className="text-white text-sm mb-2 font-medium">
+                  {players[p]} {server === p ? '(Aufschlag)' : '(Rückschlag)'}
+                </div>
+                {server === p ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => handleServe('ace')}
+                      className="p-4 bg-green-600 text-white rounded-lg font-bold active:bg-green-700"
+                    >
+                      Ass
+                    </button>
+                    <button
+                      onClick={() => handleServe('fault')}
+                      className="p-4 bg-red-600 text-white rounded-lg font-bold active:bg-red-700"
+                    >
+                      Fehler
+                    </button>
+                    <button
+                      onClick={() => handleServe('in_play')}
+                      className="p-4 bg-blue-600 text-white rounded-lg font-bold active:bg-blue-700"
+                    >
+                      Im Spiel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="h-12"></div>
+                )}
+              </div>
+            ))}
           </div>
         )}
 
@@ -604,13 +617,13 @@ const TennolinoTracker = () => {
                     onClick={() => handleRally(p === 'a' ? 'b' : 'a', 'forced_error')}
                     className="p-4 bg-orange-600 text-white rounded-lg font-bold active:bg-orange-700"
                   >
-                    Forced
+                    Erzw. Fehler
                   </button>
                   <button
                     onClick={() => handleRally(p === 'a' ? 'b' : 'a', 'unforced_error')}
                     className="p-4 bg-red-600 text-white rounded-lg font-bold active:bg-red-700"
                   >
-                    Unforced
+                    Unerzw. Fehler
                   </button>
                 </div>
               </div>
@@ -624,7 +637,7 @@ const TennolinoTracker = () => {
           disabled={history.length === 0}
           className="w-full mt-4 p-3 bg-gray-700 text-white rounded-lg font-medium disabled:opacity-50"
         >
-          Rückgängig
+          Rückgängig {history.length > 0 && `(${history.length})`}
         </button>
       </div>
     </div>
