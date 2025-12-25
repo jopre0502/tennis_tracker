@@ -451,7 +451,7 @@ const TennolinoTracker = () => {
           </button>
 
           <div className="text-center mt-4 text-xs text-gray-500">
-            v1.1
+            v1.2
           </div>
         </div>
       </div>
@@ -529,7 +529,7 @@ const TennolinoTracker = () => {
           </div>
 
           <div className="text-center mt-4 text-xs text-gray-500">
-            v1.1
+            v1.2
           </div>
         </div>
       </div>
@@ -573,35 +573,38 @@ const TennolinoTracker = () => {
 
         {/* Serve Buttons */}
         {phase === 'serve' && (
-          <div className="space-y-4 mb-4">
+          <div className="grid grid-cols-2 gap-4 mb-4">
             {['a', 'b'].map((p) => (
               <div key={p} className="bg-gray-800 rounded-lg p-3">
-                <div className="text-white text-sm mb-2 font-medium">
-                  {players[p]} {server === p ? '(Aufschlag)' : '(Rückschlag)'}
+                <div className="text-white text-xs mb-2 font-medium text-center">
+                  {players[p]}
+                </div>
+                <div className="text-white text-xs mb-2 text-center text-gray-400">
+                  {server === p ? '(Aufschlag)' : '(Rückschlag)'}
                 </div>
                 {server === p ? (
-                  <div className="grid grid-cols-3 gap-2 w-full">
+                  <div className="flex flex-col gap-2">
                     <button
                       onClick={() => handleServe('ace')}
-                      className="p-3 bg-green-600 text-white rounded-lg text-sm font-bold active:bg-green-700 min-w-0"
+                      className="p-3 bg-green-600 text-white rounded-lg text-sm font-bold active:bg-green-700"
                     >
                       Ass
                     </button>
                     <button
                       onClick={() => handleServe('fault')}
-                      className="p-3 bg-red-600 text-white rounded-lg text-sm font-bold active:bg-red-700 min-w-0"
+                      className="p-3 bg-red-600 text-white rounded-lg text-sm font-bold active:bg-red-700"
                     >
                       Fehler
                     </button>
                     <button
                       onClick={() => handleServe('in_play')}
-                      className="p-3 bg-blue-600 text-white rounded-lg text-sm font-bold active:bg-blue-700 min-w-0"
+                      className="p-3 bg-blue-600 text-white rounded-lg text-sm font-bold active:bg-blue-700"
                     >
                       Im Spiel
                     </button>
                   </div>
                 ) : (
-                  <div className="h-12"></div>
+                  <div className="h-36"></div>
                 )}
               </div>
             ))}
@@ -610,26 +613,26 @@ const TennolinoTracker = () => {
 
         {/* Rally Buttons */}
         {phase === 'rally' && (
-          <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             {['a', 'b'].map((p) => (
               <div key={p} className="bg-gray-800 rounded-lg p-3">
-                <div className="text-white text-sm mb-2 font-medium">{players[p]}</div>
-                <div className="grid grid-cols-3 gap-2 w-full">
+                <div className="text-white text-xs mb-3 font-medium text-center">{players[p]}</div>
+                <div className="flex flex-col gap-2">
                   <button
                     onClick={() => handleRally(p, 'winner')}
-                    className="p-3 bg-green-600 text-white rounded-lg text-sm font-bold active:bg-green-700 min-w-0"
+                    className="p-3 bg-green-600 text-white rounded-lg text-sm font-bold active:bg-green-700"
                   >
                     Winner
                   </button>
                   <button
                     onClick={() => handleRally(p === 'a' ? 'b' : 'a', 'forced_error')}
-                    className="p-3 bg-orange-600 text-white rounded-lg text-sm font-bold active:bg-orange-700 min-w-0"
+                    className="p-3 bg-orange-600 text-white rounded-lg text-sm font-bold active:bg-orange-700"
                   >
                     Erzwungen
                   </button>
                   <button
                     onClick={() => handleRally(p === 'a' ? 'b' : 'a', 'unforced_error')}
-                    className="p-3 bg-red-600 text-white rounded-lg text-sm font-bold active:bg-red-700 min-w-0"
+                    className="p-3 bg-red-600 text-white rounded-lg text-sm font-bold active:bg-red-700"
                   >
                     Unerzw.
                   </button>
