@@ -451,7 +451,7 @@ const TennolinoTracker = () => {
           </button>
 
           <div className="text-center mt-4 text-xs text-gray-500">
-            v1.4
+            v1.5
           </div>
         </div>
       </div>
@@ -471,21 +471,10 @@ const TennolinoTracker = () => {
             {sets.a} : {sets.b}
           </div>
 
-          <div className="text-center text-sm text-gray-600 mb-4">
+          <div className="text-center text-sm text-gray-600 mb-6">
             Gesamtpunkte: {totalPoints}
           </div>
 
-          <div className="bg-gray-100 rounded-lg p-3 mb-6 text-sm">
-            <div className="flex justify-between">
-              <span>Gewinnschläge (Ass + Winner)</span>
-              <span>{formatStat(stats.totals.winningShots, totalPoints)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Fehlerpunkte (Doppelfehler + Erzw. + Unerzw.)</span>
-              <span>{formatStat(stats.totals.errorPoints, totalPoints)}</span>
-            </div>
-          </div>
-          
           <table className="w-full text-sm mb-6">
             <thead>
               <tr className="border-b">
@@ -529,7 +518,7 @@ const TennolinoTracker = () => {
           </div>
 
           <div className="text-center mt-4 text-xs text-gray-500">
-            v1.4
+            v1.5
           </div>
         </div>
       </div>
@@ -653,7 +642,7 @@ const TennolinoTracker = () => {
 
         {/* Version */}
         <div className="text-center mt-4 text-xs text-gray-400">
-          v1.4
+          v1.5
         </div>
       </div>
     </div>
