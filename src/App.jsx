@@ -315,6 +315,13 @@ const TennolinoTracker = () => {
     localStorage.removeItem('tennolino-match-state');
   };
 
+  const abortMatch = () => {
+    if (window.confirm('Match wirklich abbrechen? Der gesamte Fortschritt geht verloren.')) {
+      resetMatch();
+      showToast('Match abgebrochen', 'error');
+    }
+  };
+
   const undoLastPoint = () => {
     if (history.length === 0) return;
 
@@ -408,6 +415,7 @@ const TennolinoTracker = () => {
         handleServe={handleServe}
         handleRally={handleRally}
         undoLastPoint={undoLastPoint}
+        onAbortMatch={abortMatch}
         onShowInfo={() => setShowInfo(true)}
       />
       <ToastContainer toasts={toasts} />

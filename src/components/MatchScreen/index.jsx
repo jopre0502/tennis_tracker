@@ -17,6 +17,7 @@ const MatchScreen = ({
   handleServe,
   handleRally,
   undoLastPoint,
+  onAbortMatch,
   onShowInfo
 }) => {
   return (
@@ -57,7 +58,7 @@ const MatchScreen = ({
           />
         )}
 
-        {/* Undo and Info Buttons */}
+        {/* Undo, Abort and Info Buttons */}
         <div className="flex gap-2 mt-4">
           <button
             onClick={undoLastPoint}
@@ -66,6 +67,13 @@ const MatchScreen = ({
             aria-label={`Letzten Punkt rückgängig machen${history.length > 0 ? `, ${history.length} Punkte in der Historie` : ''}`}
           >
             Rückgängig {history.length > 0 && `(${history.length})`}
+          </button>
+          <button
+            onClick={onAbortMatch}
+            className="p-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700"
+            aria-label="Match abbrechen"
+          >
+            ⚠️
           </button>
           <button
             onClick={onShowInfo}
