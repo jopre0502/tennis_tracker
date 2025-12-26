@@ -45,6 +45,8 @@ const TennolinoTracker = () => {
         setWinner(parsed.winner || null);
       } catch (e) {
         console.error('Failed to load saved state:', e);
+        localStorage.removeItem('tennolino-match-state');
+        showToast('Gespeicherter Stand konnte nicht geladen werden. Neues Match gestartet.', 'error');
       }
     }
   }, []);
@@ -172,46 +174,53 @@ const TennolinoTracker = () => {
   };
 
   const exportCSV = () => {
-    const headers = ['Set', 'Punktestand A', 'Punktestand B', 'Aufschlag', 'Typ', 'Gewinner', 'Zeitstempel'];
-    const rows = history.map(h => [
-      h.set,
-      h.scoreAfter.a,
-      h.scoreAfter.b,
-      h.server === 'a' ? players.a : players.b,
-      h.type,
-      h.winner === 'a' ? players.a : players.b,
-      h.timestamp
-    ]);
+    try {
+      const headers = ['Set', 'Punktestand A', 'Punktestand B', 'Aufschlag', 'Typ', 'Gewinner', 'Zeitstempel'];
+      const rows = history.map(h => [
+        h.set,
+        h.scoreAfter.a,
+        h.scoreAfter.b,
+        h.server === 'a' ? players.a : players.b,
+        h.type,
+        h.winner === 'a' ? players.a : players.b,
+        h.timestamp
+      ]);
 
-    const stats = calculateStats(history);
-    const totalPoints = stats.totals.points;
-    const statRows = [
-      [],
-      ['Statistik', players.a, players.b],
-      ['Gewonnene Punkte', formatStat(stats.players.a.pointsWon, totalPoints), formatStat(stats.players.b.pointsWon, totalPoints)],
-      ['Gewonnene Punkte (Ass + Winner)', formatStat(stats.players.a.pointsWonByWinners, totalPoints), formatStat(stats.players.b.pointsWonByWinners, totalPoints)],
-      ['Verlorene Punkte (Fehler)', formatStat(stats.players.a.pointsLostByErrors, totalPoints), formatStat(stats.players.b.pointsLostByErrors, totalPoints)],
-      ['Aufschlagpunkte gewonnen', formatStat(stats.players.a.servicePointsWon, stats.players.a.servicePoints), formatStat(stats.players.b.servicePointsWon, stats.players.b.servicePoints)],
-      ['Returnpunkte gewonnen', formatStat(stats.players.a.returnPointsWon, stats.players.a.returnPoints), formatStat(stats.players.b.returnPointsWon, stats.players.b.returnPoints)],
-      ['1. Aufschlag Quote', formatStat(stats.players.a.firstServePoints, stats.players.a.servicePoints), formatStat(stats.players.b.firstServePoints, stats.players.b.servicePoints)],
-      ['1. Aufschlag gewonnen', formatStat(stats.players.a.firstServePointsWon, stats.players.a.firstServePoints), formatStat(stats.players.b.firstServePointsWon, stats.players.b.firstServePoints)],
-      ['2. Aufschlag Quote', formatStat(stats.players.a.secondServePoints, stats.players.a.servicePoints), formatStat(stats.players.b.secondServePoints, stats.players.b.servicePoints)],
-      ['2. Aufschlag gewonnen', formatStat(stats.players.a.secondServePointsWon, stats.players.a.secondServePoints), formatStat(stats.players.b.secondServePointsWon, stats.players.b.secondServePoints)],
-      ['Asse', formatStat(stats.players.a.aces, totalPoints), formatStat(stats.players.b.aces, totalPoints)],
-      ['Doppelfehler', formatStat(stats.players.a.doubleFaults, totalPoints), formatStat(stats.players.b.doubleFaults, totalPoints)],
-      ['Winner', formatStat(stats.players.a.winners, totalPoints), formatStat(stats.players.b.winners, totalPoints)],
-      ['Erzw. Fehler', formatStat(stats.players.a.forcedErrors, totalPoints), formatStat(stats.players.b.forcedErrors, totalPoints)],
-      ['Unerzw. Fehler', formatStat(stats.players.a.unforcedErrors, totalPoints), formatStat(stats.players.b.unforcedErrors, totalPoints)],
-      ['Hinweis', 'Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte']
-    ].map(row => row.concat(Array(headers.length - row.length).fill('')));
+      const stats = calculateStats(history);
+      const totalPoints = stats.totals.points;
+      const statRows = [
+        [],
+        ['Statistik', players.a, players.b],
+        ['Gewonnene Punkte', formatStat(stats.players.a.pointsWon, totalPoints), formatStat(stats.players.b.pointsWon, totalPoints)],
+        ['Gewonnene Punkte (Ass + Winner)', formatStat(stats.players.a.pointsWonByWinners, totalPoints), formatStat(stats.players.b.pointsWonByWinners, totalPoints)],
+        ['Verlorene Punkte (Fehler)', formatStat(stats.players.a.pointsLostByErrors, totalPoints), formatStat(stats.players.b.pointsLostByErrors, totalPoints)],
+        ['Aufschlagpunkte gewonnen', formatStat(stats.players.a.servicePointsWon, stats.players.a.servicePoints), formatStat(stats.players.b.servicePointsWon, stats.players.b.servicePoints)],
+        ['Returnpunkte gewonnen', formatStat(stats.players.a.returnPointsWon, stats.players.a.returnPoints), formatStat(stats.players.b.returnPointsWon, stats.players.b.returnPoints)],
+        ['1. Aufschlag Quote', formatStat(stats.players.a.firstServePoints, stats.players.a.servicePoints), formatStat(stats.players.b.firstServePoints, stats.players.b.servicePoints)],
+        ['1. Aufschlag gewonnen', formatStat(stats.players.a.firstServePointsWon, stats.players.a.firstServePoints), formatStat(stats.players.b.firstServePointsWon, stats.players.b.firstServePoints)],
+        ['2. Aufschlag Quote', formatStat(stats.players.a.secondServePoints, stats.players.a.servicePoints), formatStat(stats.players.b.secondServePoints, stats.players.b.servicePoints)],
+        ['2. Aufschlag gewonnen', formatStat(stats.players.a.secondServePointsWon, stats.players.a.secondServePoints), formatStat(stats.players.b.secondServePointsWon, stats.players.b.secondServePoints)],
+        ['Asse', formatStat(stats.players.a.aces, totalPoints), formatStat(stats.players.b.aces, totalPoints)],
+        ['Doppelfehler', formatStat(stats.players.a.doubleFaults, totalPoints), formatStat(stats.players.b.doubleFaults, totalPoints)],
+        ['Winner', formatStat(stats.players.a.winners, totalPoints), formatStat(stats.players.b.winners, totalPoints)],
+        ['Erzw. Fehler', formatStat(stats.players.a.forcedErrors, totalPoints), formatStat(stats.players.b.forcedErrors, totalPoints)],
+        ['Unerzw. Fehler', formatStat(stats.players.a.unforcedErrors, totalPoints), formatStat(stats.players.b.unforcedErrors, totalPoints)],
+        ['Hinweis', 'Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte']
+      ].map(row => row.concat(Array(headers.length - row.length).fill('')));
 
-    const csv = [headers, ...rows, ...statRows].map(row => row.join(';')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `tennolino_${players.a}_vs_${players.b}_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
+      const csv = [headers, ...rows, ...statRows].map(row => row.join(';')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tennolino_${players.a}_vs_${players.b}_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('CSV erfolgreich exportiert');
+    } catch (err) {
+      console.error('CSV Export failed:', err);
+      showToast('Export fehlgeschlagen. Bitte erneut versuchen.', 'error');
+    }
   };
 
   const getStatsText = () => {

@@ -2,6 +2,7 @@ import Scoreboard from './Scoreboard';
 import PhaseIndicator from './PhaseIndicator';
 import ServeButtons from './ServeButtons';
 import RallyButtons from './RallyButtons';
+import packageJson from '../../../package.json';
 
 const MatchScreen = ({
   players,
@@ -77,7 +78,7 @@ const MatchScreen = ({
 
         {/* Version */}
         <div className="text-center mt-4 text-xs text-gray-400">
-          v1.15
+          v{packageJson.version}
         </div>
       </div>
     </div>
