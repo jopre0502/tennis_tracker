@@ -77,7 +77,7 @@ const MatchScreen = ({
 
         {/* Version */}
         <div className="text-center mt-4 text-xs text-gray-400">
-          v1.8
+          v1.15
         </div>
       </div>
     </div>
