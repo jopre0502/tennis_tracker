@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ToastContainer from './components/ToastContainer';
 import SetupScreen from './components/SetupScreen';
 import InfoScreen from './components/InfoScreen';
@@ -22,6 +22,50 @@ const TennolinoTracker = () => {
   const [winner, setWinner] = useState(null);
   const [showInfo, setShowInfo] = useState(false);
   const [toasts, setToasts] = useState([]);
+
+  // LocalStorage Auto-Save
+  useEffect(() => {
+    const savedState = localStorage.getItem('tennolino-match-state');
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
+        setPlayers(parsed.players || { a: 'Spieler A', b: 'Spieler B' });
+        setEditing(parsed.editing ?? true);
+        setScore(parsed.score || { a: 0, b: 0 });
+        setSets(parsed.sets || { a: 0, b: 0 });
+        setCurrentSet(parsed.currentSet || 1);
+        setTotalPoints(parsed.totalPoints || 0);
+        setServer(parsed.server || 'a');
+        setSetInitialServer(parsed.setInitialServer || 'a');
+        setPhase(parsed.phase || 'serve');
+        setIsSecondServe(parsed.isSecondServe || false);
+        setHistory(parsed.history || []);
+        setMatchOver(parsed.matchOver || false);
+        setWinner(parsed.winner || null);
+      } catch (e) {
+        console.error('Failed to load saved state:', e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const stateToSave = {
+      players,
+      editing,
+      score,
+      sets,
+      currentSet,
+      totalPoints,
+      server,
+      setInitialServer,
+      phase,
+      isSecondServe,
+      history,
+      matchOver,
+      winner
+    };
+    localStorage.setItem('tennolino-match-state', JSON.stringify(stateToSave));
+  }, [players, editing, score, sets, currentSet, totalPoints, server, setInitialServer, phase, isSecondServe, history, matchOver, winner]);
 
   // Helper Functions
   const getSetTarget = () => currentSet === 3 ? 5 : 7;
@@ -358,6 +402,7 @@ const TennolinoTracker = () => {
     setMatchOver(false);
     setWinner(null);
     setEditing(true);
+    localStorage.removeItem('tennolino-match-state');
   };
 
   const undoLastPoint = () => {
