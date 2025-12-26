@@ -14,24 +14,27 @@ const ServeButtons = ({ players, server, handleServe }) => {
               <button
                 onClick={() => handleServe('ace')}
                 className="p-5 bg-green-600 text-white rounded-lg text-lg font-bold active:bg-green-700"
+                aria-label={`Ass für ${players[p]}`}
               >
                 Ass
               </button>
               <button
                 onClick={() => handleServe('fault')}
                 className="p-5 bg-red-600 text-white rounded-lg text-lg font-bold active:bg-red-700"
+                aria-label={`Aufschlagfehler für ${players[p]}`}
               >
                 Fehler
               </button>
               <button
                 onClick={() => handleServe('in_play')}
                 className="p-5 bg-blue-600 text-white rounded-lg text-lg font-bold active:bg-blue-700"
+                aria-label={`Ball im Spiel nach Aufschlag von ${players[p]}`}
               >
                 Im Spiel
               </button>
             </div>
           ) : (
-            <div className="h-48"></div>
+            <div className="h-48" aria-hidden="true"></div>
           )}
         </div>
       ))}

@@ -8,18 +8,21 @@ const RallyButtons = ({ players, handleRally }) => {
             <button
               onClick={() => handleRally(p, 'winner')}
               className="p-5 bg-green-600 text-white rounded-lg text-lg font-bold active:bg-green-700"
+              aria-label={`Winner für ${players[p]}`}
             >
               Winner
             </button>
             <button
               onClick={() => handleRally(p === 'a' ? 'b' : 'a', 'forced_error')}
               className="p-5 bg-orange-600 text-white rounded-lg text-lg font-bold active:bg-orange-700"
+              aria-label={`Erzwungener Fehler von ${players[p]}`}
             >
               Erzwungen
             </button>
             <button
               onClick={() => handleRally(p === 'a' ? 'b' : 'a', 'unforced_error')}
               className="p-5 bg-red-600 text-white rounded-lg text-lg font-bold active:bg-red-700"
+              aria-label={`Unerzwungener Fehler von ${players[p]}`}
             >
               Unerzw.
             </button>

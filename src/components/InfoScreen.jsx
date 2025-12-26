@@ -100,6 +100,7 @@ const InfoScreen = ({ onClose }) => {
         <button
           onClick={onClose}
           className="w-full mt-4 p-4 bg-green-600 text-white rounded-lg font-bold"
+          aria-label="Statistik-Erklärungen schließen und zurück zum Match"
         >
           Zurück
         </button>
