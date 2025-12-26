@@ -1,4 +1,5 @@
 import PlayerAnalysis from './PlayerAnalysis';
+import packageJson from '../../package.json';
 
 const ResultsScreen = ({
   players,
@@ -102,7 +103,7 @@ const ResultsScreen = ({
         </div>
 
         <div className="text-center mt-4 text-xs text-gray-500">
-          v1.15
+          v{packageJson.version}
         </div>
       </div>
     </div>

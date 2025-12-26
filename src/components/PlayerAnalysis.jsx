@@ -1,5 +1,7 @@
 const PlayerAnalysis = ({ player, playerName, stats, totalPoints }) => {
-  const winnerUERate = stats.winners > 0 ? stats.winners / stats.unforcedErrors : 0;
+  const winnerUERate = stats.unforcedErrors > 0
+    ? stats.winners / stats.unforcedErrors
+    : (stats.winners > 0 ? 10 : 0); // High value when no UE but has winners
   const aggressiveMargin = (stats.winners + stats.forcedErrors) - stats.unforcedErrors;
   const uePercent = Math.round((stats.unforcedErrors / totalPoints) * 100);
 
