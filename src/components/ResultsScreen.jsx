@@ -40,12 +40,12 @@ const ResultsScreen = ({
           ))}
         </div>
 
-        <table className="w-full text-sm mb-6">
+        <table className="w-full text-sm mb-6" role="table" aria-label="Match-Statistiken">
           <thead>
             <tr className="border-b">
-              <th className="text-left py-2"></th>
-              <th className="text-center py-2">{players.a}</th>
-              <th className="text-center py-2">{players.b}</th>
+              <th className="text-left py-2" scope="col">Statistik</th>
+              <th className="text-center py-2" scope="col">{players.a}</th>
+              <th className="text-center py-2" scope="col">{players.b}</th>
             </tr>
           </thead>
           <tbody>
@@ -71,16 +71,32 @@ const ResultsScreen = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          <button onClick={onShowInfo} className="flex-1 p-3 bg-purple-600 text-white rounded-lg font-medium">
+          <button
+            onClick={onShowInfo}
+            className="flex-1 p-3 bg-purple-600 text-white rounded-lg font-medium"
+            aria-label="Statistik-Erklärungen und Trainer-Metriken anzeigen"
+          >
             📊 Statistik-Erklärungen
           </button>
-          <button onClick={onExportCSV} className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-medium">
+          <button
+            onClick={onExportCSV}
+            className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-medium"
+            aria-label="Match-Daten als CSV-Datei exportieren"
+          >
             CSV Export
           </button>
-          <button onClick={onCopyStats} className="flex-1 p-3 bg-green-600 text-white rounded-lg font-medium">
+          <button
+            onClick={onCopyStats}
+            className="flex-1 p-3 bg-green-600 text-white rounded-lg font-medium"
+            aria-label="Statistiken in Zwischenablage kopieren"
+          >
             Stats kopieren
           </button>
-          <button onClick={onReset} className="flex-1 p-3 bg-gray-600 text-white rounded-lg font-medium">
+          <button
+            onClick={onReset}
+            className="flex-1 p-3 bg-gray-600 text-white rounded-lg font-medium"
+            aria-label="Neues Match beginnen und aktuelles Match zurücksetzen"
+          >
             Neues Match
           </button>
         </div>
