@@ -106,7 +106,7 @@ const InfoScreen = ({ onClose }) => {
         </button>
 
         <div className="text-center mt-4 text-xs text-gray-500">
-          v1.8
+          v1.15
         </div>
       </div>
     </div>
