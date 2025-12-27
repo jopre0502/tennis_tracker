@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { DEFAULT_RULES } from '../hooks/useRules';
+import { useThemeContext } from '../themes/index.jsx';
 import packageJson from '../../package.json';
 
 const RulesScreen = ({ rules, onSave, onClose }) => {
   const [localRules, setLocalRules] = useState(rules);
+  const { currentThemeId, changeTheme, availableThemes } = useThemeContext();
 
   const handleSave = () => {
     onSave(localRules);
@@ -20,6 +22,37 @@ const RulesScreen = ({ rules, onSave, onClose }) => {
         <h1 className="text-2xl font-bold text-center mb-4 text-green-800">Spielregeln</h1>
 
         <div className="space-y-6">
+          {/* Theme Selection */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">Design / Theme</h2>
+            <div className="grid grid-cols-2 gap-2">
+              {availableThemes.map((theme) => (
+                <button
+                  key={theme.id}
+                  onClick={() => changeTheme(theme.id)}
+                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                    currentThemeId === theme.id
+                      ? 'border-green-600 bg-green-50'
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                  aria-label={`Theme ${theme.name} auswählen`}
+                >
+                  <div className="font-medium text-sm">{theme.name}</div>
+                  <div className="text-xs text-gray-600 mt-1">{theme.description}</div>
+                  {/* Color Preview */}
+                  <div className="flex gap-1 mt-2">
+                    <div className={`w-4 h-4 rounded ${theme.colors.primary}`}></div>
+                    <div className={`w-4 h-4 rounded ${theme.colors.accent}`}></div>
+                    <div className={`w-4 h-4 rounded ${theme.colors.success}`}></div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Theme wird sofort angewendet und gespeichert
+            </p>
+          </div>
+
           {/* Set Targets */}
           <div>
             <h2 className="text-lg font-semibold text-gray-800 mb-3">Satz-Ziele</h2>
