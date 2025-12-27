@@ -5,7 +5,8 @@ import packageJson from '../../package.json';
 
 const RulesScreen = ({ rules, onSave, onClose }) => {
   const [localRules, setLocalRules] = useState(rules);
-  const { currentThemeId, changeTheme, availableThemes } = useThemeContext();
+  const { currentThemeId, changeTheme, availableThemes, currentTheme } = useThemeContext();
+  const t = currentTheme.colors;
 
   const handleSave = () => {
     onSave(localRules);
@@ -17,14 +18,14 @@ const RulesScreen = ({ rules, onSave, onClose }) => {
   };
 
   return (
-    <div className="min-h-screen bg-green-900 p-4 flex flex-col items-center justify-center">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
-        <h1 className="text-2xl font-bold text-center mb-4 text-green-800">Spielregeln</h1>
+    <div className={`min-h-screen ${t.bgPrimary} p-4 flex flex-col items-center justify-center`}>
+      <div className={`${t.bgCard} rounded-lg p-6 w-full max-w-md shadow-xl`}>
+        <h1 className={`text-2xl font-bold text-center mb-4 ${t.primaryText}`}>Spielregeln</h1>
 
         <div className="space-y-6">
           {/* Theme Selection */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">Design / Theme</h2>
+            <h2 className={`text-lg font-semibold ${t.textSecondary} mb-3`}>Design / Theme</h2>
             <div className="grid grid-cols-2 gap-2">
               {availableThemes.map((theme) => (
                 <button
@@ -55,11 +56,11 @@ const RulesScreen = ({ rules, onSave, onClose }) => {
 
           {/* Set Targets */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">Satz-Ziele</h2>
+            <h2 className={`text-lg font-semibold ${t.textSecondary} mb-3`}>Satz-Ziele</h2>
 
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <label htmlFor="set1-target" className="text-sm font-medium text-gray-700 w-20">Satz 1:</label>
+                <label htmlFor="set1-target" className={`text-sm font-medium ${t.textSecondary} w-20`}>Satz 1:</label>
                 <input
                   id="set1-target"
                   type="number"
@@ -77,7 +78,7 @@ const RulesScreen = ({ rules, onSave, onClose }) => {
               </div>
 
               <div className="flex items-center gap-3">
-                <label htmlFor="set2-target" className="text-sm font-medium text-gray-700 w-20">Satz 2:</label>
+                <label htmlFor="set2-target" className={`text-sm font-medium ${t.textSecondary} w-20`}>Satz 2:</label>
                 <input
                   id="set2-target"
                   type="number"
@@ -95,7 +96,7 @@ const RulesScreen = ({ rules, onSave, onClose }) => {
               </div>
 
               <div className="flex items-center gap-3">
-                <label htmlFor="set3-target" className="text-sm font-medium text-gray-700 w-20">Satz 3:</label>
+                <label htmlFor="set3-target" className={`text-sm font-medium ${t.textSecondary} w-20`}>Satz 3:</label>
                 <input
                   id="set3-target"
                   type="number"
@@ -116,9 +117,9 @@ const RulesScreen = ({ rules, onSave, onClose }) => {
 
           {/* Best Of */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">Satzmodus</h2>
+            <h2 className={`text-lg font-semibold ${t.textSecondary} mb-3`}>Satzmodus</h2>
             <div className="flex items-center gap-3">
-              <label htmlFor="best-of" className="text-sm font-medium text-gray-700">Best of:</label>
+              <label htmlFor="best-of" className={`text-sm font-medium ${t.textSecondary}`}>Best of:</label>
               <input
                 id="best-of"
                 type="number"
@@ -142,9 +143,9 @@ const RulesScreen = ({ rules, onSave, onClose }) => {
 
           {/* Serve Change Interval */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">Aufschlagwechsel</h2>
+            <h2 className={`text-lg font-semibold ${t.textSecondary} mb-3`}>Aufschlagwechsel</h2>
             <div className="flex items-center gap-3">
-              <label htmlFor="serve-change" className="text-sm font-medium text-gray-700">Alle:</label>
+              <label htmlFor="serve-change" className={`text-sm font-medium ${t.textSecondary}`}>Alle:</label>
               <input
                 id="serve-change"
                 type="number"
@@ -163,9 +164,9 @@ const RulesScreen = ({ rules, onSave, onClose }) => {
           </div>
 
           {/* Standard Tennolino Info */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-            <p className="text-xs text-green-800 font-medium">Standard Tennolino Midcourt:</p>
-            <ul className="text-xs text-green-700 mt-1 space-y-1">
+          <div className={`bg-gray-50 border ${t.border} rounded-lg p-3`}>
+            <p className={`text-xs ${t.primaryText} font-medium`}>Standard Tennolino Midcourt:</p>
+            <ul className={`text-xs ${t.textSecondary} mt-1 space-y-1`}>
               <li>• Satz 1 & 2: 7 Punkte</li>
               <li>• Satz 3: 5 Punkte</li>
               <li>• Best of 3</li>
@@ -178,28 +179,28 @@ const RulesScreen = ({ rules, onSave, onClose }) => {
         <div className="flex gap-2 mt-6">
           <button
             onClick={handleReset}
-            className="flex-1 p-3 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 focus:ring-4 focus:ring-gray-400 focus:outline-none"
+            className={`flex-1 p-3 ${t.secondary} ${t.secondaryText} rounded-lg font-medium ${t.secondaryHover} focus:ring-4 ${t.secondaryRing} focus:outline-none`}
             aria-label="Regeln auf Standard zurücksetzen"
           >
             Standard
           </button>
           <button
             onClick={onClose}
-            className="flex-1 p-3 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 focus:ring-4 focus:ring-gray-300 focus:outline-none"
+            className={`flex-1 p-3 ${t.secondary} ${t.secondaryText} rounded-lg font-medium ${t.secondaryHover} focus:ring-4 ${t.secondaryRing} focus:outline-none`}
             aria-label="Regeländerungen verwerfen"
           >
             Abbrechen
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 p-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 focus:ring-4 focus:ring-green-400 focus:outline-none"
+            className={`flex-1 p-3 ${t.primary} ${t.textWhite} rounded-lg font-medium ${t.primaryHover} focus:ring-4 ${t.primaryRing} focus:outline-none`}
             aria-label="Regeln speichern"
           >
             Speichern
           </button>
         </div>
 
-        <div className="text-center mt-4 text-xs text-gray-500">
+        <div className={`text-center mt-4 text-xs ${t.textMuted}`}>
           v{packageJson.version}
         </div>
       </div>

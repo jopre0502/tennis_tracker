@@ -1,6 +1,9 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { useThemeContext } from '../themes/index.jsx';
 
 const StatsCharts = ({ players, stats }) => {
+  const { currentTheme } = useThemeContext();
+  const t = currentTheme.colors;
   // Punkteverteilung Chart Data
   const pointDistributionData = [
     {
@@ -79,7 +82,7 @@ const StatsCharts = ({ players, stats }) => {
     <div className="space-y-6 mb-6">
       {/* Punkteverteilung */}
       <div className="bg-gray-50 rounded-lg p-4">
-        <h3 className="text-sm font-bold text-gray-700 mb-3 text-center">Punkteverteilung</h3>
+        <h3 className={`text-sm font-bold ${t.textSecondary} mb-3 text-center`}>Punkteverteilung</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={pointDistributionData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -95,7 +98,7 @@ const StatsCharts = ({ players, stats }) => {
 
       {/* Aufschlag-Statistiken */}
       <div className="bg-gray-50 rounded-lg p-4">
-        <h3 className="text-sm font-bold text-gray-700 mb-3 text-center">Aufschlag-Statistiken</h3>
+        <h3 className={`text-sm font-bold ${t.textSecondary} mb-3 text-center`}>Aufschlag-Statistiken</h3>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={serveStatsData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -111,7 +114,7 @@ const StatsCharts = ({ players, stats }) => {
 
       {/* Punktegewinn Aufschlag vs Return */}
       <div className="bg-gray-50 rounded-lg p-4">
-        <h3 className="text-sm font-bold text-gray-700 mb-3 text-center">Punkte gewonnen: Aufschlag vs Return</h3>
+        <h3 className={`text-sm font-bold ${t.textSecondary} mb-3 text-center`}>Punkte gewonnen: Aufschlag vs Return</h3>
         <ResponsiveContainer width="100%" height={150}>
           <BarChart data={pointWinData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />

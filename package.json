@@ -1,6 +1,6 @@
 {
   "name": "tennis_tracker",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "Tennis Match Tracker für Tennolino Midcourt-Turniere.",
   "type": "module",
   "scripts": {
