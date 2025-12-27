@@ -1,13 +1,16 @@
 {
   "name": "tennis_tracker",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Tennis Match Tracker für Tennolino Midcourt-Turniere.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "generate-icons": "node generate-icons.js"
+    "generate-icons": "node generate-icons.js",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "repository": {
     "type": "git",
@@ -17,13 +20,19 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/ui": "^4.0.16",
     "autoprefixer": "^10.4.23",
+    "jsdom": "^27.4.0",
     "postcss": "^8.5.6",
     "sharp": "^0.34.5",
     "tailwindcss": "^3.4.19",
     "vite": "^7.3.0",
-    "vite-plugin-pwa": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.0.16"
   },
   "dependencies": {
     "react": "^19.2.3",
