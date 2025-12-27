@@ -1,3 +1,5 @@
+import packageJson from '../../package.json';
+
 const InfoScreen = ({ onClose }) => {
   return (
     <div className="min-h-screen bg-green-900 p-4">
@@ -99,14 +101,14 @@ const InfoScreen = ({ onClose }) => {
 
         <button
           onClick={onClose}
-          className="w-full mt-4 p-4 bg-green-600 text-white rounded-lg font-bold"
+          className="w-full mt-4 p-4 bg-green-600 text-white rounded-lg font-bold focus:ring-4 focus:ring-green-400 focus:outline-none hover:bg-green-700"
           aria-label="Statistik-Erklärungen schließen und zurück zum Match"
         >
           Zurück
         </button>
 
         <div className="text-center mt-4 text-xs text-gray-500">
-          v1.15
+          v{packageJson.version}
         </div>
       </div>
     </div>

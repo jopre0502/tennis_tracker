@@ -74,28 +74,28 @@ const ResultsScreen = ({
         <div className="flex flex-col gap-2">
           <button
             onClick={onShowInfo}
-            className="flex-1 p-3 bg-purple-600 text-white rounded-lg font-medium"
+            className="flex-1 p-3 bg-purple-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-purple-400 focus:outline-none hover:bg-purple-700"
             aria-label="Statistik-Erklärungen und Trainer-Metriken anzeigen"
           >
             📊 Statistik-Erklärungen
           </button>
           <button
             onClick={onExportCSV}
-            className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-medium"
+            className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-blue-400 focus:outline-none hover:bg-blue-700"
             aria-label="Match-Daten als CSV-Datei exportieren"
           >
             CSV Export
           </button>
           <button
             onClick={onCopyStats}
-            className="flex-1 p-3 bg-green-600 text-white rounded-lg font-medium"
+            className="flex-1 p-3 bg-green-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-green-400 focus:outline-none hover:bg-green-700"
             aria-label="Statistiken in Zwischenablage kopieren"
           >
             Stats kopieren
           </button>
           <button
             onClick={onReset}
-            className="flex-1 p-3 bg-gray-600 text-white rounded-lg font-medium"
+            className="flex-1 p-3 bg-gray-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-gray-400 focus:outline-none hover:bg-gray-700"
             aria-label="Neues Match beginnen und aktuelles Match zurücksetzen"
           >
             Neues Match
