@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import PlayerAnalysis from './PlayerAnalysis';
+import StatsCharts from './StatsCharts';
 import packageJson from '../../package.json';
 
 const ResultsScreen = ({
@@ -13,6 +15,7 @@ const ResultsScreen = ({
   onReset
 }) => {
   const totalPoints = stats.totals.points;
+  const [showCharts, setShowCharts] = useState(true);
 
   return (
     <div className="min-h-screen bg-green-900 p-4">
@@ -41,7 +44,24 @@ const ResultsScreen = ({
           ))}
         </div>
 
-        <table className="w-full text-sm mb-6" role="table" aria-label="Match-Statistiken">
+        {/* Toggle Button */}
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={() => setShowCharts(!showCharts)}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 focus:ring-4 focus:ring-gray-300 focus:outline-none"
+            aria-label={showCharts ? 'Zur Tabellen-Ansicht wechseln' : 'Zur Grafik-Ansicht wechseln'}
+          >
+            {showCharts ? '📊 → 📋 Tabelle' : '📋 → 📊 Grafiken'}
+          </button>
+        </div>
+
+        {/* Charts View */}
+        {showCharts && <StatsCharts players={players} stats={stats} />}
+
+        {/* Table View */}
+        {!showCharts && (
+          <>
+            <table className="w-full text-sm mb-6" role="table" aria-label="Match-Statistiken">
           <thead>
             <tr className="border-b">
               <th className="text-left py-2" scope="col">Statistik</th>
@@ -65,11 +85,13 @@ const ResultsScreen = ({
             <tr><td className="py-1">Erzw. Fehler</td><td className="text-center">{formatStat(stats.players.a.forcedErrors, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.forcedErrors, totalPoints)}</td></tr>
             <tr><td className="py-1">Unerzw. Fehler</td><td className="text-center">{formatStat(stats.players.a.unforcedErrors, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.unforcedErrors, totalPoints)}</td></tr>
           </tbody>
-        </table>
+            </table>
 
-        <div className="text-xs text-gray-600 mb-6">
-          Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte
-        </div>
+            <div className="text-xs text-gray-600 mb-6">
+              Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte
+            </div>
+          </>
+        )}
 
         <div className="flex flex-col gap-2">
           <button
