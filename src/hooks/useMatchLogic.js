@@ -205,6 +205,7 @@ export const useMatchLogic = (showToast, rules) => {
 
   // Reset Match
   const resetMatch = () => {
+    setPlayers({ a: 'Spieler A', b: 'Spieler B' });
     setScore({ a: 0, b: 0 });
     setSets({ a: 0, b: 0 });
     setCurrentSet(1);
