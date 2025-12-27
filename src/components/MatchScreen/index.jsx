@@ -3,6 +3,7 @@ import PhaseIndicator from './PhaseIndicator';
 import ServeButtons from './ServeButtons';
 import RallyButtons from './RallyButtons';
 import packageJson from '../../../package.json';
+import { useThemeContext } from '../../themes/index.jsx';
 
 const MatchScreen = ({
   players,
@@ -20,8 +21,11 @@ const MatchScreen = ({
   onAbortMatch,
   onShowInfo
 }) => {
+  const { currentTheme } = useThemeContext();
+  const t = currentTheme.colors;
+
   return (
-    <div className="min-h-screen bg-green-900 p-4">
+    <div className={`min-h-screen ${t.bgPrimary} p-4`}>
       <div className="max-w-md mx-auto">
         {/* Scoreboard */}
         <Scoreboard
@@ -63,21 +67,21 @@ const MatchScreen = ({
           <button
             onClick={undoLastPoint}
             disabled={history.length === 0}
-            className="flex-1 p-3 bg-gray-700 text-white rounded-lg font-medium disabled:opacity-50 focus:ring-4 focus:ring-gray-400 focus:outline-none hover:bg-gray-800"
+            className={`flex-1 p-3 ${t.bgCardDark} ${t.textWhite} rounded-lg font-medium disabled:opacity-50 focus:ring-4 ${t.secondaryRing} focus:outline-none hover:bg-slate-700`}
             aria-label={`Letzten Punkt rückgängig machen${history.length > 0 ? `, ${history.length} Punkte in der Historie` : ''}`}
           >
             Rückgängig {history.length > 0 && `(${history.length})`}
           </button>
           <button
             onClick={onAbortMatch}
-            className="p-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 focus:ring-4 focus:ring-orange-400 focus:outline-none"
+            className={`p-3 ${t.warning} ${t.textWhite} rounded-lg font-medium ${t.warningHover} focus:ring-4 ${t.warningRing} focus:outline-none`}
             aria-label="Match abbrechen"
           >
             ⚠️
           </button>
           <button
             onClick={onShowInfo}
-            className="p-3 bg-purple-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-purple-400 focus:outline-none hover:bg-purple-700"
+            className={`p-3 ${t.info} ${t.textWhite} rounded-lg font-medium focus:ring-4 ${t.infoRing} focus:outline-none ${t.infoHover}`}
             aria-label="Statistik-Erklärungen anzeigen"
           >
             ℹ️
@@ -85,7 +89,7 @@ const MatchScreen = ({
         </div>
 
         {/* Version */}
-        <div className="text-center mt-4 text-xs text-gray-400">
+        <div className={`text-center mt-4 text-xs ${t.textMuted}`}>
           v{packageJson.version}
         </div>
       </div>

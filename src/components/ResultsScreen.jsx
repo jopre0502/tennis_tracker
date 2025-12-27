@@ -2,6 +2,7 @@ import { useState } from 'react';
 import PlayerAnalysis from './PlayerAnalysis';
 import StatsCharts from './StatsCharts';
 import packageJson from '../../package.json';
+import { useThemeContext } from '../themes/index.jsx';
 
 const ResultsScreen = ({
   players,
@@ -16,18 +17,20 @@ const ResultsScreen = ({
 }) => {
   const totalPoints = stats.totals.points;
   const [showCharts, setShowCharts] = useState(true);
+  const { currentTheme } = useThemeContext();
+  const t = currentTheme.colors;
 
   return (
-    <div className="min-h-screen bg-green-900 p-4">
-      <div className="bg-white rounded-lg p-6 max-w-md mx-auto shadow-xl">
-        <h1 className="text-2xl font-bold text-center mb-2 text-green-800">Match beendet</h1>
+    <div className={`min-h-screen ${t.bgPrimary} p-4`}>
+      <div className={`${t.bgCard} rounded-lg p-6 max-w-md mx-auto shadow-xl`}>
+        <h1 className={`text-2xl font-bold text-center mb-2 ${t.primaryText}`}>Match beendet</h1>
         <p className="text-center text-xl mb-6">{players[winner]} gewinnt!</p>
 
         <div className="text-center text-3xl font-bold mb-6">
           {sets.a} : {sets.b}
         </div>
 
-        <div className="text-center text-sm text-gray-600 mb-4">
+        <div className={`text-center text-sm ${t.textSecondary} mb-4`}>
           Gesamtpunkte: {totalPoints}
         </div>
 
@@ -48,7 +51,7 @@ const ResultsScreen = ({
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setShowCharts(!showCharts)}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 focus:ring-4 focus:ring-gray-300 focus:outline-none"
+            className={`px-4 py-2 ${t.secondary} ${t.secondaryText} rounded-lg font-medium ${t.secondaryHover} focus:ring-4 ${t.secondaryRing} focus:outline-none`}
             aria-label={showCharts ? 'Zur Tabellen-Ansicht wechseln' : 'Zur Grafik-Ansicht wechseln'}
           >
             {showCharts ? '📊 → 📋 Tabelle' : '📋 → 📊 Grafiken'}
@@ -87,7 +90,7 @@ const ResultsScreen = ({
           </tbody>
             </table>
 
-            <div className="text-xs text-gray-600 mb-6">
+            <div className={`text-xs ${t.textSecondary} mb-6`}>
               Prozent: bei Aufschlag/Return bezogen auf eigene Aufschlag- bzw. Returnpunkte; sonst Anteil aller Punkte
             </div>
           </>
@@ -96,35 +99,35 @@ const ResultsScreen = ({
         <div className="flex flex-col gap-2">
           <button
             onClick={onShowInfo}
-            className="flex-1 p-3 bg-purple-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-purple-400 focus:outline-none hover:bg-purple-700"
+            className={`flex-1 p-3 ${t.info} ${t.textWhite} rounded-lg font-medium focus:ring-4 ${t.infoRing} focus:outline-none ${t.infoHover}`}
             aria-label="Statistik-Erklärungen und Trainer-Metriken anzeigen"
           >
             📊 Statistik-Erklärungen
           </button>
           <button
             onClick={onExportCSV}
-            className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-blue-400 focus:outline-none hover:bg-blue-700"
+            className={`flex-1 p-3 ${t.info} ${t.textWhite} rounded-lg font-medium focus:ring-4 ${t.infoRing} focus:outline-none ${t.infoHover}`}
             aria-label="Match-Daten als CSV-Datei exportieren"
           >
             CSV Export
           </button>
           <button
             onClick={onCopyStats}
-            className="flex-1 p-3 bg-green-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-green-400 focus:outline-none hover:bg-green-700"
+            className={`flex-1 p-3 ${t.success} ${t.textWhite} rounded-lg font-medium focus:ring-4 ${t.successRing} focus:outline-none ${t.successHover}`}
             aria-label="Statistiken in Zwischenablage kopieren"
           >
             Stats kopieren
           </button>
           <button
             onClick={onReset}
-            className="flex-1 p-3 bg-gray-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-gray-400 focus:outline-none hover:bg-gray-700"
+            className={`flex-1 p-3 ${t.secondary} ${t.secondaryText} rounded-lg font-medium focus:ring-4 ${t.secondaryRing} focus:outline-none ${t.secondaryHover}`}
             aria-label="Neues Match beginnen und aktuelles Match zurücksetzen"
           >
             Neues Match
           </button>
         </div>
 
-        <div className="text-center mt-4 text-xs text-gray-500">
+        <div className={`text-center mt-4 text-xs ${t.textMuted}`}>
           v{packageJson.version}
         </div>
       </div>
