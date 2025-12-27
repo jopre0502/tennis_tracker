@@ -1,6 +1,6 @@
 {
   "name": "tennis_tracker",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Tennis Match Tracker für Tennolino Midcourt-Turniere.",
   "type": "module",
   "scripts": {
@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "recharts": "^3.6.0"
   }
 }
