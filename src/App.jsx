@@ -4,12 +4,15 @@ import SetupScreen from './components/SetupScreen';
 import InfoScreen from './components/InfoScreen';
 import ResultsScreen from './components/ResultsScreen';
 import MatchScreen from './components/MatchScreen';
+import RulesScreen from './components/RulesScreen';
 import { calculateStats, formatStat } from './utils/statistics';
 import { useMatchLogic } from './hooks/useMatchLogic';
+import { useRules } from './hooks/useRules';
 
 const TennolinoTracker = () => {
   // UI State (nicht im Hook)
   const [showInfo, setShowInfo] = useState(false);
+  const [showRules, setShowRules] = useState(false);
   const [toasts, setToasts] = useState([]);
 
   // Toast Helper
@@ -21,6 +24,9 @@ const TennolinoTracker = () => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 3000);
   };
+
+  // Rules Hook
+  const { rules, updateRules } = useRules();
 
   // Match Logic Hook
   const {
@@ -48,9 +54,22 @@ const TennolinoTracker = () => {
     abortMatch,
     exportCSV,
     copyStatsToClipboard
-  } = useMatchLogic(showToast);
+  } = useMatchLogic(showToast, rules);
 
   // Render
+  if (showRules) {
+    return (
+      <>
+        <RulesScreen
+          rules={rules}
+          onSave={updateRules}
+          onClose={() => setShowRules(false)}
+        />
+        <ToastContainer toasts={toasts} />
+      </>
+    );
+  }
+
   if (showInfo) {
     return (
       <>
@@ -70,6 +89,7 @@ const TennolinoTracker = () => {
           setServer={setServer}
           setSetInitialServer={setSetInitialServer}
           onStart={() => setEditing(false)}
+          onShowRules={() => setShowRules(true)}
         />
         <ToastContainer toasts={toasts} />
       </>

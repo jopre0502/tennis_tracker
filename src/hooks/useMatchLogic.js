@@ -4,9 +4,10 @@ import { calculateStats, formatStat } from '../utils/statistics';
 /**
  * Custom Hook für Match-Logik und State-Management
  * @param {Function} showToast - Callback function to show toast notifications
+ * @param {Object} rules - Game rules configuration
  * @returns {Object} Match state and functions
  */
-export const useMatchLogic = (showToast) => {
+export const useMatchLogic = (showToast, rules) => {
   // State
   const [players, setPlayers] = useState({ a: 'Spieler A', b: 'Spieler B' });
   const [editing, setEditing] = useState(true);
@@ -71,10 +72,13 @@ export const useMatchLogic = (showToast) => {
   }, [players, editing, score, sets, currentSet, totalPoints, server, setInitialServer, phase, isSecondServe, history, matchOver, winner]);
 
   // Helper Functions
-  const getSetTarget = () => currentSet === 3 ? 5 : 7;
+  const getSetTarget = () => {
+    const setIndex = currentSet - 1;
+    return rules.setTargets[setIndex] || rules.setTargets[rules.setTargets.length - 1];
+  };
 
   const getServerAfterPoints = (points, initialServer) => {
-    const switches = Math.floor(points / 2);
+    const switches = Math.floor(points / rules.serveChangeInterval);
     return switches % 2 === 0 ? initialServer : (initialServer === 'a' ? 'b' : 'a');
   };
 
@@ -97,8 +101,9 @@ export const useMatchLogic = (showToast) => {
   };
 
   const checkMatchWin = (newSets) => {
-    if (newSets.a >= 2) return 'a';
-    if (newSets.b >= 2) return 'b';
+    const setsNeeded = Math.ceil(rules.bestOf / 2);
+    if (newSets.a >= setsNeeded) return 'a';
+    if (newSets.b >= setsNeeded) return 'b';
     return null;
   };
 
