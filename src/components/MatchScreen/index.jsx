@@ -63,21 +63,21 @@ const MatchScreen = ({
           <button
             onClick={undoLastPoint}
             disabled={history.length === 0}
-            className="flex-1 p-3 bg-gray-700 text-white rounded-lg font-medium disabled:opacity-50"
+            className="flex-1 p-3 bg-gray-700 text-white rounded-lg font-medium disabled:opacity-50 focus:ring-4 focus:ring-gray-400 focus:outline-none hover:bg-gray-800"
             aria-label={`Letzten Punkt rückgängig machen${history.length > 0 ? `, ${history.length} Punkte in der Historie` : ''}`}
           >
             Rückgängig {history.length > 0 && `(${history.length})`}
           </button>
           <button
             onClick={onAbortMatch}
-            className="p-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700"
+            className="p-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 focus:ring-4 focus:ring-orange-400 focus:outline-none"
             aria-label="Match abbrechen"
           >
             ⚠️
           </button>
           <button
             onClick={onShowInfo}
-            className="p-3 bg-purple-600 text-white rounded-lg font-medium"
+            className="p-3 bg-purple-600 text-white rounded-lg font-medium focus:ring-4 focus:ring-purple-400 focus:outline-none hover:bg-purple-700"
             aria-label="Statistik-Erklärungen anzeigen"
           >
             ℹ️
