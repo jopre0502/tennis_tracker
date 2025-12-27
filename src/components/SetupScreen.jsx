@@ -1,4 +1,6 @@
-const SetupScreen = ({ players, setPlayers, server, setServer, setSetInitialServer, onStart }) => {
+import packageJson from '../../package.json';
+
+const SetupScreen = ({ players, setPlayers, server, setServer, setSetInitialServer, onStart, onShowRules }) => {
   return (
     <div className="min-h-screen bg-green-900 p-4 flex flex-col items-center justify-center">
       <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
@@ -58,8 +60,16 @@ const SetupScreen = ({ players, setPlayers, server, setServer, setSetInitialServ
           Match starten
         </button>
 
+        <button
+          onClick={onShowRules}
+          className="w-full mt-3 p-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 focus:ring-4 focus:ring-gray-300 focus:outline-none"
+          aria-label="Spielregeln anpassen"
+        >
+          ⚙️ Spielregeln
+        </button>
+
         <div className="text-center mt-4 text-xs text-gray-500">
-          v1.15
+          v{packageJson.version}
         </div>
       </div>
     </div>
