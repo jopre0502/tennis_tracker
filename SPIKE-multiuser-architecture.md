@@ -387,43 +387,38 @@ Das Repo ist oeffentlich. Supabase-Credentials (API-URL, Anon Key) muessen trotz
 
 ---
 
-## 8. Implementierungs-Roadmap (Vorschlag)
+## 8. Fehlende Features im aktuellen Frontend
 
-### Phase 1: Auth-Integration (Minimal Viable)
+### 8.1 Datum/Uhrzeit auf Match-Ebene
 
-- [ ] Supabase-Projekt erstellen
-- [ ] `@supabase/supabase-js` installieren
-- [ ] Supabase-Client initialisieren (`supabaseClient.js`)
-- [ ] Login-Screen mit Google + Email/Password
-- [ ] Auth-State in React Context
-- [ ] Environment Variables via Vite (`import.meta.env.VITE_SUPABASE_URL`)
+**Ist-Zustand:** Einzelne Punkte haben bereits `timestamp: new Date().toISOString()` (in `useMatchLogic.js:92`). Aber es gibt kein Match-Level Start-/End-Zeitstempel.
 
-### Phase 2: Datenbank-Migration
+**Soll:** Match-Objekt braucht `startedAt` (beim Start setzen) und `finishedAt` (bei Match-Ende setzen). Das ist unabhaengig von der Multi-User-Architektur sinnvoll und sollte vorher implementiert werden.
 
-- [ ] Tabellen in Supabase erstellen (matches, points, match_statistics)
-- [ ] RLS-Policies aktivieren und testen
-- [ ] Bestehenden `useMatchLogic` Hook erweitern: nach Match-Ende -> save to Supabase
-- [ ] Match-History-Screen: Abgeschlossene Matches aus Supabase laden
+### 8.2 Match-uebergreifende Statistiken
 
-### Phase 3: Match-Verwaltung
+**Ist-Zustand:** `calculateStats()` in `statistics.js` berechnet nur Statistiken fuer ein einzelnes Match. Es gibt keine Aggregation ueber mehrere Matches.
 
-- [ ] Dashboard mit allen eigenen Matches
-- [ ] Match-Details ansehen (vergangene Matches)
-- [ ] Match loeschen
-- [ ] Statistiken ueber mehrere Matches (Langzeit-Entwicklung)
+**Soll (bestaetigt):**
+- **Gewinn/Verlust-Bilanz:** Gesamtrekord, Winrate, Siegesserie, Bilanz pro Gegner
+- **Trends ueber Zeit:** Entwicklung von Aufschlag-%, Unforced Error Rate, Winner:Error Ratio ueber Wochen/Monate als Linien-Charts
 
-### Phase 4: Offline-Sync (Optional)
+**Benoetigt:** Eine `calculateAggregateStats(matches[])` Funktion und neue Chart-Komponenten.
 
-- [ ] Sync-Manager implementieren
-- [ ] Offline-Queue fuer nicht gespeicherte Matches
-- [ ] Konflikt-Erkennung
+### 8.3 Aufwandsschaetzung (Gesamtueberblick)
 
-### Phase 5: Erweiterungen (Optional)
+| Phase | Umfang | Schaetzung |
+|---|---|---|
+| Phase 1: Auth | Supabase Setup, Login, Auth Context | ~1-2 Sessions |
+| Phase 2: Persistenz | DB-Tabellen, RLS, Speichern/Laden | ~2-3 Sessions |
+| Phase 3: Match-History + Stats | Dashboard, Aggregierte Stats, Trends | ~2-3 Sessions |
+| Phase 4: Offline-Sync | Sync-Manager, Queue | ~2-3 Sessions |
+| Phase 5: Match-Sharing | Public Links, Sharing-RLS | ~1-2 Sessions |
+| **MVP (Phase 1-2)** | | **~3-5 Sessions** |
+| **Solides Produkt (Phase 1-3)** | | **~5-8 Sessions** |
+| **Komplett (Phase 1-5)** | | **~8-13 Sessions** |
 
-- [ ] Matches teilen (Public-Link mit separater RLS-Policy)
-- [ ] Team/Trainer-Zugriff (Role-Based Access)
-- [ ] Statistik-Vergleich zwischen Spielern
-- [ ] Export als PDF
+Detaillierte Planung siehe `projekt.md`.
 
 ---
 
