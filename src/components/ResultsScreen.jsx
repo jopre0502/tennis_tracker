@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import PlayerAnalysis from './PlayerAnalysis';
 import StatsCharts from './StatsCharts';
 import packageJson from '../../package.json';
 import { useThemeContext } from '../themes/index.jsx';
+import { calculateStats } from '../utils/statistics';
 
 const ResultsScreen = ({
   players,
@@ -16,21 +17,40 @@ const ResultsScreen = ({
   onCopyStats,
   onReset
 }) => {
-  const totalPoints = stats.totals.points;
   const [showCharts, setShowCharts] = useState(true);
+  const [activeTab, setActiveTab] = useState(0); // 0 = Gesamt, 1+ = Satz
   const { currentTheme } = useThemeContext();
   const t = currentTheme.colors;
 
   // Compute final score for each set from history
   const setScores = [];
+  const setNumbers = [];
   if (history && history.length > 0) {
-    const setNumbers = [...new Set(history.map(h => h.set))].sort((a, b) => a - b);
-    for (const setNum of setNumbers) {
+    const uniqueSets = [...new Set(history.map(h => h.set))].sort((a, b) => a - b);
+    for (const setNum of uniqueSets) {
+      setNumbers.push(setNum);
       const setPoints = history.filter(h => h.set === setNum);
       const lastPoint = setPoints[setPoints.length - 1];
       setScores.push({ set: setNum, a: lastPoint.scoreAfter.a, b: lastPoint.scoreAfter.b });
     }
   }
+
+  // Calculate stats for active tab (0 = full match, 1+ = per set)
+  const activeStats = useMemo(() => {
+    if (activeTab === 0) return stats;
+    const setNum = setNumbers[activeTab - 1];
+    if (setNum === undefined) return stats;
+    const filteredHistory = history.filter(h => h.set === setNum);
+    return calculateStats(filteredHistory);
+  }, [activeTab, history, stats, setNumbers]);
+
+  const totalPoints = activeStats.totals.points;
+
+  // Tab labels
+  const tabs = [
+    { label: 'Gesamt', key: 0 },
+    ...setNumbers.map((setNum, i) => ({ label: `Satz ${setNum}`, key: i + 1 }))
+  ];
 
   return (
     <div className={`min-h-screen ${t.bgPrimary} p-4`}>
@@ -53,17 +73,38 @@ const ResultsScreen = ({
         )}
 
         <div className={`text-center text-sm ${t.textSecondary} mb-4`}>
-          Gesamtpunkte: {totalPoints}
+          {activeTab === 0 ? 'Gesamtpunkte' : `Punkte Satz ${setNumbers[activeTab - 1]}`}: {totalPoints}
         </div>
+
+        {/* Statistik-Tabs */}
+        {setNumbers.length > 1 && (
+          <div className="flex gap-1 mb-4 overflow-x-auto" role="tablist" aria-label="Statistik-Tabs">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                role="tab"
+                aria-selected={activeTab === tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus:ring-2 ${t.primaryRing} ${
+                  activeTab === tab.key
+                    ? `${t.primary} ${t.textWhite}`
+                    : `${t.secondary} ${t.secondaryText} ${t.secondaryHover}`
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Player Analysis */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {['a', 'b'].map((p) => (
             <PlayerAnalysis
-              key={p}
+              key={`${p}-${activeTab}`}
               player={p}
               playerName={players[p]}
-              stats={stats.players[p]}
+              stats={activeStats.players[p]}
               totalPoints={totalPoints}
             />
           ))}
@@ -81,7 +122,7 @@ const ResultsScreen = ({
         </div>
 
         {/* Charts View */}
-        {showCharts && <StatsCharts players={players} stats={stats} />}
+        {showCharts && <StatsCharts players={players} stats={activeStats} />}
 
         {/* Table View */}
         {!showCharts && (
@@ -95,20 +136,20 @@ const ResultsScreen = ({
             </tr>
           </thead>
           <tbody>
-            <tr><td className="py-1">Gewonnene Punkte</td><td className="text-center">{formatStat(stats.players.a.pointsWon, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.pointsWon, totalPoints)}</td></tr>
-            <tr><td className="py-1">Gewonnene Punkte (Ass + Winner)</td><td className="text-center">{formatStat(stats.players.a.pointsWonByWinners, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.pointsWonByWinners, totalPoints)}</td></tr>
-            <tr><td className="py-1">Verlorene Punkte (Fehler)</td><td className="text-center">{formatStat(stats.players.a.pointsLostByErrors, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.pointsLostByErrors, totalPoints)}</td></tr>
-            <tr><td className="py-1">Aufschlagpunkte gewonnen</td><td className="text-center">{formatStat(stats.players.a.servicePointsWon, stats.players.a.servicePoints)}</td><td className="text-center">{formatStat(stats.players.b.servicePointsWon, stats.players.b.servicePoints)}</td></tr>
-            <tr><td className="py-1">Returnpunkte gewonnen</td><td className="text-center">{formatStat(stats.players.a.returnPointsWon, stats.players.a.returnPoints)}</td><td className="text-center">{formatStat(stats.players.b.returnPointsWon, stats.players.b.returnPoints)}</td></tr>
-            <tr><td className="py-1">1. Aufschlag Quote</td><td className="text-center">{formatStat(stats.players.a.firstServePoints, stats.players.a.servicePoints)}</td><td className="text-center">{formatStat(stats.players.b.firstServePoints, stats.players.b.servicePoints)}</td></tr>
-            <tr><td className="py-1">1. Aufschlag gewonnen</td><td className="text-center">{formatStat(stats.players.a.firstServePointsWon, stats.players.a.firstServePoints)}</td><td className="text-center">{formatStat(stats.players.b.firstServePointsWon, stats.players.b.firstServePoints)}</td></tr>
-            <tr><td className="py-1">2. Aufschlag Quote</td><td className="text-center">{formatStat(stats.players.a.secondServePoints, stats.players.a.servicePoints)}</td><td className="text-center">{formatStat(stats.players.b.secondServePoints, stats.players.b.servicePoints)}</td></tr>
-            <tr><td className="py-1">2. Aufschlag gewonnen</td><td className="text-center">{formatStat(stats.players.a.secondServePointsWon, stats.players.a.secondServePoints)}</td><td className="text-center">{formatStat(stats.players.b.secondServePointsWon, stats.players.b.secondServePoints)}</td></tr>
-            <tr><td className="py-1">Asse</td><td className="text-center">{formatStat(stats.players.a.aces, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.aces, totalPoints)}</td></tr>
-            <tr><td className="py-1">Doppelfehler</td><td className="text-center">{formatStat(stats.players.a.doubleFaults, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.doubleFaults, totalPoints)}</td></tr>
-            <tr><td className="py-1">Winner</td><td className="text-center">{formatStat(stats.players.a.winners, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.winners, totalPoints)}</td></tr>
-            <tr><td className="py-1">Erzw. Fehler</td><td className="text-center">{formatStat(stats.players.a.forcedErrors, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.forcedErrors, totalPoints)}</td></tr>
-            <tr><td className="py-1">Unerzw. Fehler</td><td className="text-center">{formatStat(stats.players.a.unforcedErrors, totalPoints)}</td><td className="text-center">{formatStat(stats.players.b.unforcedErrors, totalPoints)}</td></tr>
+            <tr><td className="py-1">Gewonnene Punkte</td><td className="text-center">{formatStat(activeStats.players.a.pointsWon, totalPoints)}</td><td className="text-center">{formatStat(activeStats.players.b.pointsWon, totalPoints)}</td></tr>
+            <tr><td className="py-1">Gewonnene Punkte (Ass + Winner)</td><td className="text-center">{formatStat(activeStats.players.a.pointsWonByWinners, totalPoints)}</td><td className="text-center">{formatStat(activeStats.players.b.pointsWonByWinners, totalPoints)}</td></tr>
+            <tr><td className="py-1">Verlorene Punkte (Fehler)</td><td className="text-center">{formatStat(activeStats.players.a.pointsLostByErrors, totalPoints)}</td><td className="text-center">{formatStat(activeStats.players.b.pointsLostByErrors, totalPoints)}</td></tr>
+            <tr><td className="py-1">Aufschlagpunkte gewonnen</td><td className="text-center">{formatStat(activeStats.players.a.servicePointsWon, activeStats.players.a.servicePoints)}</td><td className="text-center">{formatStat(activeStats.players.b.servicePointsWon, activeStats.players.b.servicePoints)}</td></tr>
+            <tr><td className="py-1">Returnpunkte gewonnen</td><td className="text-center">{formatStat(activeStats.players.a.returnPointsWon, activeStats.players.a.returnPoints)}</td><td className="text-center">{formatStat(activeStats.players.b.returnPointsWon, activeStats.players.b.returnPoints)}</td></tr>
+            <tr><td className="py-1">1. Aufschlag Quote</td><td className="text-center">{formatStat(activeStats.players.a.firstServePoints, activeStats.players.a.servicePoints)}</td><td className="text-center">{formatStat(activeStats.players.b.firstServePoints, activeStats.players.b.servicePoints)}</td></tr>
+            <tr><td className="py-1">1. Aufschlag gewonnen</td><td className="text-center">{formatStat(activeStats.players.a.firstServePointsWon, activeStats.players.a.firstServePoints)}</td><td className="text-center">{formatStat(activeStats.players.b.firstServePointsWon, activeStats.players.b.firstServePoints)}</td></tr>
+            <tr><td className="py-1">2. Aufschlag Quote</td><td className="text-center">{formatStat(activeStats.players.a.secondServePoints, activeStats.players.a.servicePoints)}</td><td className="text-center">{formatStat(activeStats.players.b.secondServePoints, activeStats.players.b.servicePoints)}</td></tr>
+            <tr><td className="py-1">2. Aufschlag gewonnen</td><td className="text-center">{formatStat(activeStats.players.a.secondServePointsWon, activeStats.players.a.secondServePoints)}</td><td className="text-center">{formatStat(activeStats.players.b.secondServePointsWon, activeStats.players.b.secondServePoints)}</td></tr>
+            <tr><td className="py-1">Asse</td><td className="text-center">{formatStat(activeStats.players.a.aces, totalPoints)}</td><td className="text-center">{formatStat(activeStats.players.b.aces, totalPoints)}</td></tr>
+            <tr><td className="py-1">Doppelfehler</td><td className="text-center">{formatStat(activeStats.players.a.doubleFaults, totalPoints)}</td><td className="text-center">{formatStat(activeStats.players.b.doubleFaults, totalPoints)}</td></tr>
+            <tr><td className="py-1">Winner</td><td className="text-center">{formatStat(activeStats.players.a.winners, totalPoints)}</td><td className="text-center">{formatStat(activeStats.players.b.winners, totalPoints)}</td></tr>
+            <tr><td className="py-1">Erzw. Fehler</td><td className="text-center">{formatStat(activeStats.players.a.forcedErrors, totalPoints)}</td><td className="text-center">{formatStat(activeStats.players.b.forcedErrors, totalPoints)}</td></tr>
+            <tr><td className="py-1">Unerzw. Fehler</td><td className="text-center">{formatStat(activeStats.players.a.unforcedErrors, totalPoints)}</td><td className="text-center">{formatStat(activeStats.players.b.unforcedErrors, totalPoints)}</td></tr>
           </tbody>
             </table>
 
