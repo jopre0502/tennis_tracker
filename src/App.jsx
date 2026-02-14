@@ -104,6 +104,7 @@ const TennolinoTracker = () => {
           players={players}
           winner={winner}
           sets={sets}
+          history={history}
           stats={stats}
           formatStat={formatStat}
           onShowInfo={() => setShowInfo(true)}

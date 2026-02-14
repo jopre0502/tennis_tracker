@@ -283,9 +283,20 @@ export const useMatchLogic = (showToast, rules) => {
   const getStatsText = () => {
     const stats = calculateStats(history);
     const totalPoints = stats.totals.points;
+    // Compute per-set scores from history
+    const setScoreParts = [];
+    if (history.length > 0) {
+      const setNumbers = [...new Set(history.map(h => h.set))].sort((a, b) => a - b);
+      for (const setNum of setNumbers) {
+        const setPoints = history.filter(h => h.set === setNum);
+        const lastPoint = setPoints[setPoints.length - 1];
+        setScoreParts.push(`${lastPoint.scoreAfter.a}:${lastPoint.scoreAfter.b}`);
+      }
+    }
+
     const lines = [
       `Match: ${players.a} vs ${players.b}`,
-      `Ergebnis: ${sets.a} : ${sets.b}`,
+      `Ergebnis: ${sets.a} : ${sets.b}` + (setScoreParts.length > 0 ? ` (${setScoreParts.join(', ')})` : ''),
       `Gewinner: ${winner ? players[winner] : '-'}`,
       `Gesamtpunkte: ${totalPoints}`,
       '',
