@@ -8,6 +8,7 @@ const ResultsScreen = ({
   players,
   winner,
   sets,
+  history,
   stats,
   formatStat,
   onShowInfo,
@@ -20,15 +21,36 @@ const ResultsScreen = ({
   const { currentTheme } = useThemeContext();
   const t = currentTheme.colors;
 
+  // Compute final score for each set from history
+  const setScores = [];
+  if (history && history.length > 0) {
+    const setNumbers = [...new Set(history.map(h => h.set))].sort((a, b) => a - b);
+    for (const setNum of setNumbers) {
+      const setPoints = history.filter(h => h.set === setNum);
+      const lastPoint = setPoints[setPoints.length - 1];
+      setScores.push({ set: setNum, a: lastPoint.scoreAfter.a, b: lastPoint.scoreAfter.b });
+    }
+  }
+
   return (
     <div className={`min-h-screen ${t.bgPrimary} p-4`}>
       <div className={`${t.bgCard} rounded-lg p-6 max-w-md mx-auto shadow-xl`}>
         <h1 className={`text-2xl font-bold text-center mb-2 ${t.primaryText}`}>Match beendet</h1>
         <p className="text-center text-xl mb-6">{players[winner]} gewinnt!</p>
 
-        <div className="text-center text-3xl font-bold mb-6">
+        <div className="text-center text-3xl font-bold mb-2">
           {sets.a} : {sets.b}
         </div>
+
+        {setScores.length > 0 && (
+          <div className={`text-center text-sm ${t.textSecondary} mb-4`}>
+            {setScores.map((s, i) => (
+              <span key={s.set}>
+                {i > 0 && '  ·  '}{s.a}:{s.b}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className={`text-center text-sm ${t.textSecondary} mb-4`}>
           Gesamtpunkte: {totalPoints}
